@@ -1,0 +1,123 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import api from '@/services/api';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { AppointmentCardSkeleton, StatCardSkeleton } from '@/components/ui/Skeleton';
+import { Users, Calendar, Check, X } from 'lucide-react';
+
+interface Appointment {
+  _id: string;
+  patientId: {
+    name: string;
+    email: string;
+  };
+  date: string;
+  status: string;
+  reason: string;
+}
+
+export default function DoctorDashboard() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAppointments = async () => {
+    try {
+      const { data } = await api.get('/appointments/my');
+      setAppointments(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const handleStatusUpdate = async (id: string, status: string) => {
+    try {
+      await api.put(`/appointments/${id}/status`, { status });
+      fetchAppointments();
+    } catch (error) {
+      console.error("Failed to update status", error);
+      alert("Failed to update status");
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold text-slate-900">Doctor Dashboard</h1>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        {loading ? (
+          <StatCardSkeleton />
+        ) : (
+          <Card className="bg-indigo-500 text-white border-none">
+            <CardContent className="pt-6">
+              <div className="text-indigo-100 mb-2">Total Appointments</div>
+              <div className="text-4xl font-bold">{appointments.length}</div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">My Appointments</h2>
+
+        {loading ? (
+          <div className="space-y-4">
+            <AppointmentCardSkeleton />
+            <AppointmentCardSkeleton />
+            <AppointmentCardSkeleton />
+          </div>
+        ) : appointments.length === 0 ? (
+          <div className="text-center py-12 text-slate-500">
+            <Calendar className="mx-auto mb-3 opacity-20" size={48} />
+            <p>No appointments found</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {appointments.map((apt) => (
+              <div key={apt._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg hover:bg-slate-50 gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 bg-indigo-100 text-indigo-600 rounded-full">
+                    <Users size={20} />
+                  </div>
+                  <div>
+                    <p className="font-semibold">{apt.patientId?.name || 'Unknown Patient'}</p>
+                    <p className="text-sm text-slate-600">{apt.reason}</p>
+                    <p className="text-xs text-slate-500">
+                      {new Date(apt.date).toLocaleDateString()} at {new Date(apt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium capitalize mr-2 ${apt.status === 'approved' ? 'text-green-600 bg-green-50' :
+                      apt.status === 'cancelled' ? 'text-red-600 bg-red-50' : 'text-yellow-600 bg-yellow-50'
+                    }`}>
+                    {apt.status}
+                  </div>
+
+                  {apt.status === 'pending' && (
+                    <>
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700 h-8" onClick={() => handleStatusUpdate(apt._id, 'approved')}>
+                        <Check size={16} className="mr-1" /> Accept
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 h-8" onClick={() => handleStatusUpdate(apt._id, 'cancelled')}>
+                        <X size={16} className="mr-1" /> Reject
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
