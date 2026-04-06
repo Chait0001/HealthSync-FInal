@@ -75,7 +75,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -120,18 +120,18 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
-        <div className="p-4 border-b border-slate-200">
+      <div className="bg-card rounded-lg border border-border shadow-sm">
+        <div className="p-4 border-b border-border">
           <h2 className="text-lg font-semibold">All Users</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50">
+            <thead className="bg-muted">
               <tr>
-                <th className="text-left p-4 text-sm font-medium text-slate-600">Name</th>
-                <th className="text-left p-4 text-sm font-medium text-slate-600">Email</th>
-                <th className="text-left p-4 text-sm font-medium text-slate-600">Role</th>
-                <th className="text-right p-4 text-sm font-medium text-slate-600">Actions</th>
+                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Name</th>
+                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Email</th>
+                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Role</th>
+                <th className="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -143,9 +143,9 @@ export default function AdminDashboard() {
                 </>
               ) : (
                 users.map((u) => (
-                  <tr key={u._id} className="border-t border-slate-100 hover:bg-slate-50">
+                  <tr key={u._id} className="border-t border-border hover:bg-muted/50">
                     <td className="p-4">{u.name}</td>
-                    <td className="p-4 text-slate-600">{u.email}</td>
+                    <td className="p-4 text-muted-foreground">{u.email}</td>
                     <td className="p-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${u.role === 'admin' ? 'bg-red-100 text-red-700' :
                           u.role === 'doctor' ? 'bg-green-100 text-green-700' :

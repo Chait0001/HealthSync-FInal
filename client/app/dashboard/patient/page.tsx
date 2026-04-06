@@ -51,7 +51,7 @@ export default function PatientDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-slate-900">Patient Dashboard</h1>
+        <h1 className="text-3xl font-bold text-foreground">Patient Dashboard</h1>
         <Link href="/dashboard/patient/book">
           <Button className="gap-2">
             <Plus size={16} /> Book Appointment
@@ -72,7 +72,7 @@ export default function PatientDashboard() {
         )}
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">My Appointments</h2>
 
         {loading ? (
@@ -82,22 +82,22 @@ export default function PatientDashboard() {
             <AppointmentCardSkeleton />
           </div>
         ) : appointments.length === 0 ? (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-muted-foreground">
             <Calendar className="mx-auto mb-3 opacity-20" size={48} />
             <p>No appointments scheduled</p>
           </div>
         ) : (
           <div className="space-y-4">
             {appointments.map((apt) => (
-              <div key={apt._id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors">
+              <div key={apt._id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="p-2 bg-blue-100 text-blue-600 rounded-full">
                     <Calendar size={20} />
                   </div>
                   <div>
                     <p className="font-semibold">Dr. {apt.doctorId?.userId?.name || 'Unknown'}</p>
-                    <p className="text-sm text-slate-600">{apt.doctorId?.specialization || 'General'}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm text-muted-foreground">{apt.doctorId?.specialization || 'General'}</p>
+                    <p className="text-xs text-muted-foreground/70">
                       {new Date(apt.date).toLocaleDateString()} at {new Date(apt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>

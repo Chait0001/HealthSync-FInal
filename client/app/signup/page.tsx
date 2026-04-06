@@ -9,6 +9,17 @@ import Link from 'next/link';
 import { Loader2, Heart } from 'lucide-react';
 import { NoiseBackground } from '@/components/ui/noise-background';
 
+const SPECIALIZATIONS = [
+  'Cardiology',
+  'Dermatology',
+  'Neurology',
+  'Pediatrics',
+  'Orthopedics',
+  'Ophthalmology',
+  'Dentistry',
+  'Psychology'
+];
+
 export default function SignupPage() {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -214,14 +225,37 @@ export default function SignupPage() {
                       </div>
                       <div className="space-y-2">
                         <label className={labelClassName}>Blood Group</label>
-                        <Input name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} placeholder="O+" className={inputClassName} />
+                        <select name="bloodGroup" className={selectClassName} value={formData.bloodGroup} onChange={handleChange}>
+                          <option value="" disabled>Select Blood Group</option>
+                          <option value="A+">A+</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B-">B-</option>
+                          <option value="AB+">AB+</option>
+                          <option value="AB-">AB-</option>
+                          <option value="O+">O+</option>
+                          <option value="O-">O-</option>
+                        </select>
                       </div>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2 col-span-2">
                         <label className={labelClassName}>Specialization</label>
-                        <Input name="specialization" value={formData.specialization} onChange={handleChange} required placeholder="Cardiology" className={inputClassName} />
+                        <select
+                          name="specialization"
+                          className={selectClassName}
+                          value={formData.specialization}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="" disabled>Select Specialization</option>
+                          {SPECIALIZATIONS.map((spec) => (
+                            <option key={spec} value={spec}>
+                              {spec}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div className="space-y-2">
                         <label className={labelClassName}>Experience (Years)</label>

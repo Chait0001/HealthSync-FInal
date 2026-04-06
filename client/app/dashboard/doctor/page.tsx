@@ -49,7 +49,7 @@ export default function DoctorDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-slate-900">Doctor Dashboard</h1>
+      <h1 className="text-3xl font-bold text-foreground">Doctor Dashboard</h1>
 
       <div className="grid md:grid-cols-3 gap-6">
         {loading ? (
@@ -64,7 +64,7 @@ export default function DoctorDashboard() {
         )}
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         <h2 className="text-lg font-semibold mb-4">My Appointments</h2>
 
         {loading ? (
@@ -74,22 +74,22 @@ export default function DoctorDashboard() {
             <AppointmentCardSkeleton />
           </div>
         ) : appointments.length === 0 ? (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-muted-foreground">
             <Calendar className="mx-auto mb-3 opacity-20" size={48} />
             <p>No appointments found</p>
           </div>
         ) : (
           <div className="space-y-4">
             {appointments.map((apt) => (
-              <div key={apt._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg hover:bg-slate-50 gap-4">
+              <div key={apt._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-2 bg-indigo-100 text-indigo-600 rounded-full">
                     <Users size={20} />
                   </div>
                   <div>
                     <p className="font-semibold">{apt.patientId?.name || 'Unknown Patient'}</p>
-                    <p className="text-sm text-slate-600">{apt.reason}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm text-muted-foreground">{apt.reason}</p>
+                    <p className="text-xs text-muted-foreground/70">
                       {new Date(apt.date).toLocaleDateString()} at {new Date(apt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>

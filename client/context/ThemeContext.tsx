@@ -9,15 +9,36 @@ interface ThemeContextType {
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  }
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    document.body.style.backgroundColor = theme === "light" ? "#fff" : "#000";
-  }, [theme])
+    const savedTheme = localStorage.getItem('healthsync-theme') as "light" | "dark";
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem('healthsync-theme', newTheme);
+  };
+
+  useEffect(() => {
+    if (mounted) {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.style.backgroundColor = '';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.style.backgroundColor = '';
+      }
+    }
+  }, [theme, mounted]);
+
+  // Prevent hydration mismatch by rendering nothing before mounted, OR just render children
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}

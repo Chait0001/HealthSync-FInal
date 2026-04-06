@@ -18,10 +18,10 @@ import {
 // Skeleton Loading for the entire dashboard layout
 function DashboardSkeleton() {
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-background text-foreground">
       {/* Sidebar Skeleton */}
-      <aside className="bg-white border-r border-slate-200 w-64 flex flex-col">
-        <div className="p-4 border-b border-slate-100">
+      <aside className="bg-card border-r border-border w-64 flex flex-col">
+        <div className="p-4 border-b border-border">
           <Skeleton className="h-7 w-32" />
         </div>
         <nav className="flex-1 p-4 space-y-2">
@@ -29,7 +29,7 @@ function DashboardSkeleton() {
           <Skeleton className="h-10 w-full rounded-md" />
           <Skeleton className="h-10 w-full rounded-md" />
         </nav>
-        <div className="p-4 border-t border-slate-100 space-y-3">
+        <div className="p-4 border-t border-border space-y-3">
           <div className="flex items-center gap-3">
             <Skeleton className="w-10 h-10 rounded-full" />
             <div className="space-y-2">
@@ -82,7 +82,7 @@ function DashboardSkeleton() {
           </div>
 
           {/* Content Cards */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+          <div className="bg-card rounded-xl border border-border p-6 space-y-4">
             <Skeleton className="h-6 w-40" />
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
@@ -153,6 +153,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const adminLinks = [
     { href: '/dashboard/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/admin/appointments', label: 'Verify Appointments', icon: Calendar },
     { href: '/dashboard/admin/doctors', label: 'Manage Doctors', icon: Stethoscope },
     { href: '/dashboard/admin/users', label: 'All Users', icon: Users },
   ];
@@ -162,10 +163,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (user.role === 'admin') links = adminLinks;
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-background text-foreground">
       {/* Sidebar */}
-      <aside className={`bg-white border-r border-slate-200 transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} flex flex-col`}>
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+      <aside className={`bg-card border-r border-border transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} flex flex-col`}>
+        <div className="p-4 border-b border-border flex items-center justify-between">
           <span className={`font-bold text-xl text-blue-600 ${!isSidebarOpen && 'hidden'}`}>HealthSync</span>
           <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-1 rounded hover:bg-slate-100 lg:hidden">
             {/* Mobile Toggle Placeholder */}
@@ -178,8 +179,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               key={link.href}
               href={link.href}
               className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${pathname === link.href
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
                 }`}
             >
               <link.icon size={20} />
@@ -188,14 +189,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           ))}
         </nav>
 
-        <div className="p-4 border-t border-slate-100">
+        <div className="p-4 border-t border-border">
           <div className={`flex items-center gap-3 mb-4 ${!isSidebarOpen && 'justify-center'}`}>
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
               {user.name?.charAt(0) || 'U'}
             </div>
             <div className={`${!isSidebarOpen && 'hidden'}`}>
               <p className="text-sm font-medium">{user.name || 'User'}</p>
-              <p className="text-xs text-slate-500 capitalize">{user.role}</p>
+              <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
             </div>
           </div>
           <Button variant="ghost" className="w-full justify-start text-red-500 hover:bg-red-50 hover:text-red-600" onClick={logout}>

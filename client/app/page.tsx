@@ -333,7 +333,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="/signup"
-                className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/25"
+                className="px-5 py-2.5 bg-black dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-neutral-800 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-lg font-medium transition-all hover:shadow-lg dark:hover:shadow-emerald-500/25"
               >
                 Get Started Free
               </Link>
@@ -376,7 +376,7 @@ export default function LandingPage() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-emerald-500/25 hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-black dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-neutral-800 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-xl font-semibold text-lg transition-all hover:shadow-xl dark:hover:shadow-emerald-500/25 hover:-translate-y-0.5"
                 >
                   <Zap size={20} />
                   Start Free Trial
@@ -486,8 +486,8 @@ export default function LandingPage() {
                 >
                   <feature.icon size={28} className="text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3 relative z-20 text-neutral-900 dark:text-white">{feature.title}</h3>
-                <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed relative z-20">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-3 relative z-20 text-white">{feature.title}</h3>
+                <p className="text-neutral-300 leading-relaxed relative z-20">{feature.description}</p>
               </CardSpotlight>
             ))}
           </div>
@@ -520,14 +520,14 @@ export default function LandingPage() {
                     <Star key={j} size={18} className="fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-neutral-600 dark:text-neutral-300 mb-6 leading-relaxed relative z-20">"{testimonial.content}"</p>
+                <p className="text-neutral-200 mb-6 leading-relaxed relative z-20">"{testimonial.content}"</p>
                 <div className="flex items-center gap-4 relative z-20">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center font-bold text-sm text-white">
                     {testimonial.initials}
                   </div>
                   <div>
-                    <div className="font-semibold text-neutral-900 dark:text-white">{testimonial.name}</div>
-                    <div className="text-sm text-neutral-500 dark:text-neutral-400">{testimonial.role}</div>
+                    <div className="font-semibold text-white">{testimonial.name}</div>
+                    <div className="text-sm text-neutral-400">{testimonial.role}</div>
                   </div>
                 </div>
               </CardSpotlight>
