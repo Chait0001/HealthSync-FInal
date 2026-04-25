@@ -27,9 +27,15 @@ import {
   Building2,
   UserCheck,
   Pill,
-  ClipboardList
+  ClipboardList,
+  Twitter,
+  Linkedin,
+  Facebook
 } from 'lucide-react';
 import { ModeToggle } from '@/components/ModeToggle';
+import AnimatedSection from '@/components/shared/AnimatedSection';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CORE_FEATURES, ADVANCED_FEATURES, SPECIALTIES, TESTIMONIALS, MAIN_FEATURES } from '@/constants/landing';
 
 // Custom hook for scroll animations
 function useScrollAnimation() {
@@ -56,7 +62,24 @@ function useScrollAnimation() {
   return { ref, isVisible };
 }
 
-// Animated counter component
+// Animated counter hook
+function useCountAnimation(target: number, duration: number = 2000, startCounting: boolean = false) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!startCounting) return;
+    let startTime: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      setCount(Math.floor(progress * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [target, duration, startCounting]);
+
+  return count;
+}
 
 
 // Dropdown Menu Component
@@ -90,6 +113,161 @@ function DropdownMenu({
   );
 }
 
+// Testimonials Carousel
+type Testimonial = { name: string; role: string; initials: string; content: string; rating: number };
+function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] }) {
+  const [current, setCurrent] = useState(0);
+  const [direction, setCarouselDirection] = useState(1);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCarouselDirection(1);
+      setCurrent((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
+
+  const go = (idx: number) => {
+    setCarouselDirection(idx > current ? 1 : -1);
+    setCurrent(idx);
+  };
+
+  const t = testimonials[current];
+
+  return (
+    <div className="relative">
+      <div className="overflow-hidden rounded-2xl bg-[#0d1117] border border-white/5 p-8 md:p-12 min-h-[260px]">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={current}
+            custom={direction}
+            initial={{ opacity: 0, x: direction * 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -60 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <div className="flex items-center gap-1 mb-6">
+              {[...Array(t.rating)].map((_, j) => (
+                <Star key={j} size={18} className="fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+            <p className="text-neutral-200 text-xl leading-relaxed mb-8">"{t.content}"</p>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center font-bold text-sm text-white">
+                {t.initials}
+              </div>
+              <div>
+                <div className="font-semibold text-white">{t.name}</div>
+                <div className="text-sm text-neutral-400">{t.role}</div>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center justify-between mt-6">
+        <button
+          onClick={() => go((current - 1 + testimonials.length) % testimonials.length)}
+          className="w-10 h-10 rounded-full border border-white/10 hover:border-emerald-500/50 flex items-center justify-center text-neutral-400 hover:text-white transition-all"
+        >
+          &#8592;
+        </button>
+        <div className="flex items-center gap-2">
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => go(i)}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-emerald-400 w-6' : 'bg-neutral-600 hover:bg-neutral-400'}`}
+            />
+          ))}
+        </div>
+        <button
+          onClick={() => go((current + 1) % testimonials.length)}
+          className="w-10 h-10 rounded-full border border-white/10 hover:border-emerald-500/50 flex items-center justify-center text-neutral-400 hover:text-white transition-all"
+        >
+          &#8594;
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Hero Dashboard Stats with animated counters
+function HeroDashboardStats() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+  const patients = useCountAnimation(24, 1500, started);
+  const pending = useCountAnimation(5, 1000, started);
+  const revenue = useCountAnimation(2450, 2000, started);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStarted(true); }, { threshold: 0.5 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const stats = [
+    { label: 'Patients Today', value: patients, prefix: '', color: 'bg-emerald-500/20 text-emerald-400' },
+    { label: 'Pending', value: pending, prefix: '', color: 'bg-yellow-500/20 text-yellow-400' },
+    { label: 'Revenue', value: revenue, prefix: '$', color: 'bg-cyan-500/20 text-cyan-400' },
+  ];
+
+  return (
+    <div ref={ref} className="grid grid-cols-3 gap-4">
+      {stats.map((stat) => (
+        <div key={stat.label} className={`${stat.color} rounded-lg p-4`}>
+          <div className="text-2xl font-bold">{stat.prefix}{stat.value.toLocaleString()}</div>
+          <div className="text-sm opacity-80">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Stats Section Component
+function StatsSection() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+  const professionals = useCountAnimation(40000, 2000, started);
+  const satisfaction = useCountAnimation(98, 1500, started);
+  const hospitals = useCountAnimation(500, 1800, started);
+  const uptime = useCountAnimation(99, 1200, started);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([e]) => { if (e.isIntersecting) setStarted(true); }, { threshold: 0.3 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const stats = [
+    { value: professionals, suffix: '+', label: 'Healthcare Professionals', sublabel: 'Trust HealthSync worldwide' },
+    { value: satisfaction, suffix: '%', label: 'Patient Satisfaction', sublabel: 'Average rating from clinics' },
+    { value: hospitals, suffix: '+', label: 'Hospitals Connected', sublabel: 'Across 40+ countries' },
+    { value: uptime, suffix: '%', label: 'Uptime Guarantee', sublabel: 'Enterprise-grade reliability' },
+  ];
+
+  return (
+    <section className="py-20 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, i) => (
+            <AnimatedSection key={i} delay={i * 0.1} direction="up">
+              <div className="bg-[#0d1117] border border-white/5 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300">
+                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                  {stat.value.toLocaleString()}{stat.suffix}
+                </div>
+                <div className="text-white font-semibold mb-1">{stat.label}</div>
+                <div className="text-neutral-500 text-sm">{stat.sublabel}</div>
+              </div>
+            </AnimatedSection>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function LandingPage() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -97,7 +275,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -112,92 +290,6 @@ export default function LandingPage() {
     }
   }, [openDropdown]);
 
-  const coreFeatures = [
-    { icon: ClipboardList, label: 'Electronic Medical Records' },
-    { icon: Pill, label: 'E-Prescription' },
-    { icon: Calendar, label: 'Appointment Scheduling' },
-    { icon: FileText, label: 'Invoice & Billing' },
-    { icon: UserCheck, label: 'Patient Management' },
-    { icon: Clock, label: 'Queue Management' },
-  ];
-
-  const advancedFeatures = [
-    { icon: MessageSquare, label: 'Patient Communication' },
-    { icon: Users, label: 'Multi-User Role Access' },
-    { icon: BarChart3, label: 'Analytics & Reports' },
-    { icon: Globe, label: 'Telemedicine Support' },
-    { icon: Smartphone, label: 'Mobile App Access' },
-    { icon: Lock, label: 'HIPAA Compliant Security' },
-  ];
-
-  const specialties = [
-    'Cardiology', 'Dermatology', 'Neurology', 'Pediatrics',
-    'Orthopedics', 'Ophthalmology', 'Dentistry', 'Psychology'
-  ];
-
-  const testimonials = [
-    {
-      name: 'Dr. Sarah Johnson',
-      role: 'Cardiologist, HeartCare Clinic',
-      initials: 'DSJ',
-      content: 'HealthSync has transformed how we manage our practice. The appointment scheduling alone has saved us countless hours.',
-      rating: 5
-    },
-    {
-      name: 'Dr. Michael Chen',
-      role: 'General Practitioner',
-      initials: 'DMC',
-      content: 'The patient communication features are incredible. Our patient satisfaction scores have improved by 40%.',
-      rating: 5
-    },
-    {
-      name: 'Dr. Emily Williams',
-      role: 'Pediatrician, Kids First Clinic',
-      initials: 'DEW',
-      content: 'Easy to use, powerful features, and excellent support. Exactly what modern healthcare needs.',
-      rating: 5
-    }
-  ];
-
-  const features = [
-    {
-      icon: Calendar,
-      title: 'Smart Scheduling',
-      description: 'AI-powered appointment scheduling that reduces no-shows and optimizes your calendar automatically.',
-      colors: [[16, 185, 129], [6, 182, 212]] // emerald to cyan
-    },
-    {
-      icon: FileText,
-      title: 'Electronic Health Records',
-      description: 'Secure, cloud-based EHR system with templates for every specialty. Access records anywhere.',
-      colors: [[6, 182, 212], [59, 130, 246]] // cyan to blue
-    },
-    {
-      icon: MessageSquare,
-      title: 'Patient Communication',
-      description: 'Automated reminders, secure messaging, and telehealth integration for better patient engagement.',
-      colors: [[59, 130, 246], [139, 92, 246]] // blue to purple
-    },
-    {
-      icon: BarChart3,
-      title: 'Analytics Dashboard',
-      description: 'Real-time insights into your practice performance, revenue trends, and patient demographics.',
-      colors: [[139, 92, 246], [168, 85, 247]] // purple
-    },
-    {
-      icon: Shield,
-      title: 'Security & Compliance',
-      description: 'HIPAA compliant with end-to-end encryption. Your patient data is always protected.',
-      colors: [[239, 68, 68], [249, 115, 22]] // red to orange
-    },
-    {
-      icon: HeadphonesIcon,
-      title: '24/7 Support',
-      description: 'Dedicated support team available round the clock. Average response time under 5 minutes.',
-      colors: [[249, 115, 22], [234, 179, 8]] // orange to yellow
-    },
-  ];
-
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
   const { ref: featuresRef, isVisible: featuresVisible } = useScrollAnimation();
 
@@ -205,9 +297,9 @@ export default function LandingPage() {
 
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#080c14] text-neutral-900 dark:text-white transition-colors duration-300">
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 dark:bg-black/95 backdrop-blur-md shadow-lg border-b border-neutral-200 dark:border-neutral-800' : 'bg-transparent'
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-md bg-[#080c14]/90 border-b border-white/5 shadow-lg' : 'bg-transparent'
         }`}>
 
         <div className="max-w-7xl mx-auto px-6">
@@ -236,7 +328,7 @@ export default function LandingPage() {
                       Core Features
                     </h4>
                     <div className="space-y-3">
-                      {coreFeatures.map((feature) => (
+                      {CORE_FEATURES.map((feature) => (
                         <a key={feature.label} href="#" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-emerald-600 dark:hover:text-white transition-colors group">
                           <feature.icon size={18} className="text-emerald-500 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
                           <span>{feature.label}</span>
@@ -249,7 +341,7 @@ export default function LandingPage() {
                       Advanced Features
                     </h4>
                     <div className="space-y-3">
-                      {advancedFeatures.map((feature) => (
+                      {ADVANCED_FEATURES.map((feature) => (
                         <a key={feature.label} href="#" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-cyan-600 dark:hover:text-white transition-colors group">
                           <feature.icon size={18} className="text-cyan-500 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
                           <span>{feature.label}</span>
@@ -272,7 +364,7 @@ export default function LandingPage() {
                       By Specialty
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
-                      {specialties.map((specialty) => (
+                      {SPECIALTIES.map((specialty) => (
                         <a key={specialty} href="#" className="text-neutral-400 hover:text-white transition-colors py-1">
                           {specialty}
                         </a>
@@ -333,7 +425,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="/signup"
-                className="px-5 py-2.5 bg-black dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-neutral-800 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-lg font-medium transition-all hover:shadow-lg dark:hover:shadow-emerald-500/25"
+                className="px-5 py-2.5 bg-[#080c14] dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-neutral-800 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-lg font-medium transition-all hover:shadow-lg dark:hover:shadow-emerald-500/25"
               >
                 Get Started Free
               </Link>
@@ -345,10 +437,11 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        {/* Gradient Mesh Background Blobs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse"></div>
+          <div className="absolute top-1/2 -right-60 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+          <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-blue-500/8 rounded-full blur-[80px] animate-pulse delay-500"></div>
         </div>
 
         <div
@@ -359,8 +452,6 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-
-
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
                 Simplify Your Practice with{' '}
                 <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
@@ -376,7 +467,7 @@ export default function LandingPage() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-black dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-neutral-800 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-xl font-semibold text-lg transition-all hover:shadow-xl dark:hover:shadow-emerald-500/25 hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-[#080c14] dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-neutral-800 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-xl font-semibold text-lg transition-all hover:shadow-xl dark:hover:shadow-emerald-500/25 hover:-translate-y-0.5"
                 >
                   <Zap size={20} />
                   Start Free Trial
@@ -386,14 +477,12 @@ export default function LandingPage() {
                   Watch Demo
                 </button>
               </div>
-
-
             </div>
 
-            {/* Right Content - Dashboard Preview */}
-            <div className="relative">
+            {/* Right Content - Dashboard Preview with float animation */}
+            <div className="relative animate-float">
               <div className="bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 bg-white/50 dark:bg-black/50 border-b border-neutral-200 dark:border-neutral-800">
+                <div className="flex items-center gap-2 px-4 py-3 bg-white/50 dark:bg-[#080c14]/50 border-b border-neutral-200 dark:border-neutral-800">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
@@ -404,19 +493,8 @@ export default function LandingPage() {
                     <h3 className="font-semibold text-neutral-900 dark:text-white">Good Morning, Dr. Smith!</h3>
                     <span className="text-neutral-500 text-sm">Today: 8 Appointments</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    {[
-                      { label: 'Patients Today', value: '24', color: 'bg-emerald-500/20 text-emerald-400' },
-                      { label: 'Pending', value: '5', color: 'bg-yellow-500/20 text-yellow-400' },
-                      { label: 'Revenue', value: '$2,450', color: 'bg-cyan-500/20 text-cyan-400' },
-                    ].map((stat) => (
-                      <div key={stat.label} className={`${stat.color} rounded-lg p-4`}>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <div className="text-sm opacity-80">{stat.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="bg-neutral-100 dark:bg-black/50 rounded-lg p-4">
+                  <HeroDashboardStats />
+                  <div className="bg-neutral-100 dark:bg-[#080c14]/50 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium text-neutral-900 dark:text-white">Appointment Schedule</span>
                       <span className="text-xs text-emerald-500 dark:text-emerald-400">View All</span>
@@ -440,7 +518,7 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Floating elements */}
+              {/* Floating notification badge */}
               <div className="absolute -top-4 -right-4 bg-emerald-500 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
                 <span className="flex items-center gap-2 text-sm font-medium">
                   <Check size={16} /> New Patient Added!
@@ -472,67 +550,42 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, i) => (
-              <CardSpotlight
-                key={i}
-                className="rounded-2xl"
-                color="#1a1a1a"
-              >
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-6"
-                  style={{
-                    background: `linear-gradient(135deg, rgb(${feature.colors[0].join(',')}) 0%, rgb(${feature.colors[1].join(',')}) 100%)`
-                  }}
+            {MAIN_FEATURES.map((feature, i) => (
+              <AnimatedSection key={i} delay={i * 0.08} direction="up">
+                <CardSpotlight
+                  className="rounded-2xl bg-[#0d1117] border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-teal-500/40 hover:shadow-lg hover:shadow-teal-500/10 h-full"
+                  color="#0d1117"
                 >
-                  <feature.icon size={28} className="text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3 relative z-20 text-white">{feature.title}</h3>
-                <p className="text-neutral-300 leading-relaxed relative z-20">{feature.description}</p>
-              </CardSpotlight>
+                  <div
+                    className="w-14 h-14 rounded-xl flex items-center justify-center mb-6"
+                    style={{
+                      background: `linear-gradient(135deg, rgb(${feature.colors[0].join(',')}) 0%, rgb(${feature.colors[1].join(',')}) 100%)`
+                    }}
+                  >
+                    <feature.icon size={28} className="text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3 relative z-20 text-white">{feature.title}</h3>
+                  <p className="text-neutral-300 leading-relaxed relative z-20">{feature.description}</p>
+                </CardSpotlight>
+              </AnimatedSection>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section with CardSpotlight */}
-      <section
-        ref={testimonialsRef}
-        className={`py-24 px-6 bg-neutral-50 dark:bg-neutral-950 transition-all duration-1000 ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-      >
-        <div className="max-w-7xl mx-auto">
+      {/* Stats Section */}
+      <StatsSection />
+
+      {/* Testimonials Carousel Section */}
+      <section className="py-24 px-6 bg-[#0a0f1a]">
+        <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <span className="text-emerald-400 font-semibold uppercase tracking-wider text-sm">Testimonials</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">
               Loved by Healthcare Professionals
             </h2>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, i) => (
-              <CardSpotlight
-                key={i}
-                className="rounded-2xl"
-                color="#0d3d30"
-              >
-                <div className="flex items-center gap-1 mb-4 relative z-20">
-                  {[...Array(testimonial.rating)].map((_, j) => (
-                    <Star key={j} size={18} className="fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-neutral-200 mb-6 leading-relaxed relative z-20">"{testimonial.content}"</p>
-                <div className="flex items-center gap-4 relative z-20">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center font-bold text-sm text-white">
-                    {testimonial.initials}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-white">{testimonial.name}</div>
-                    <div className="text-sm text-neutral-400">{testimonial.role}</div>
-                  </div>
-                </div>
-              </CardSpotlight>
-            ))}
-          </div>
+          <TestimonialsCarousel testimonials={TESTIMONIALS} />
         </div>
       </section>
 
@@ -569,7 +622,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-6 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
+      <footer className="py-16 px-6 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#080c14]">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-5 gap-12">
             <div className="md:col-span-2">
@@ -585,10 +638,14 @@ export default function LandingPage() {
                 The all-in-one healthcare management platform trusted by 40,000+ professionals worldwide.
               </p>
               <div className="flex items-center gap-4">
-                {['Twitter', 'LinkedIn', 'Facebook'].map((social) => (
-                  <a key={social} href="#" className="w-10 h-10 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
-                    <span className="sr-only">{social}</span>
-                    <Globe size={18} className="text-neutral-600 dark:text-neutral-400" />
+                {[
+                  { name: 'Twitter', icon: Twitter },
+                  { name: 'LinkedIn', icon: Linkedin },
+                  { name: 'Facebook', icon: Facebook },
+                ].map(({ name, icon: Icon }) => (
+                  <a key={name} href="#" className="w-10 h-10 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+                    <span className="sr-only">{name}</span>
+                    <Icon size={18} className="text-neutral-600 dark:text-neutral-400" />
                   </a>
                 ))}
               </div>

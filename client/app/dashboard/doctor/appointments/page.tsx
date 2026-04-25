@@ -26,10 +26,12 @@ export default function DoctorAppointmentsPage() {
 
   const fetchAppointments = async () => {
     try {
-      const { data } = await api.get('/appointments/my');
-      setAppointments(data);
+      const response = await api.get('/appointments/my');
+      const data = response.data.data || response.data;
+      setAppointments(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
+      setAppointments([]);
     } finally {
       setLoading(false);
     }
@@ -48,9 +50,10 @@ export default function DoctorAppointmentsPage() {
     }
   };
 
+  const appointmentsList = Array.isArray(appointments) ? appointments : [];
   const filteredAppointments = filter === 'all'
-    ? appointments
-    : appointments.filter(a => a.status === filter);
+    ? appointmentsList
+    : appointmentsList.filter(a => a.status === filter);
 
   return (
     <div className="space-y-6">
@@ -58,7 +61,7 @@ export default function DoctorAppointmentsPage() {
         <Link href="/dashboard/doctor">
           <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">All Appointments</h1>
+        <h1 className="text-3xl font-bold text-white">All Appointments</h1>
       </div>
 
       <div className="flex gap-2">

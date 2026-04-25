@@ -13,7 +13,7 @@ export default function MedicalHistoryPage() {
         <Link href="/dashboard/patient">
           <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Medical History</h1>
+        <h1 className="text-3xl font-bold text-white">Medical History</h1>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">

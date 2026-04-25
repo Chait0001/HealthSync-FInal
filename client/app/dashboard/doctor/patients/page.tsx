@@ -21,9 +21,11 @@ export default function MyPatientsPage() {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const { data: appointments } = await api.get('/appointments/my');
+        const response = await api.get('/appointments/my');
+        const appointments = response.data.data || response.data;
+        const aptArray = Array.isArray(appointments) ? appointments : [];
         const uniquePatients = new Map<string, PatientFromAppointment>();
-        appointments.forEach((apt: any) => {
+        aptArray.forEach((apt: any) => {
           if (apt.patientId && apt.patientId._id && !uniquePatients.has(apt.patientId._id)) {
             uniquePatients.set(apt.patientId._id, {
               _id: apt.patientId._id,
@@ -35,6 +37,7 @@ export default function MyPatientsPage() {
         setPatients(Array.from(uniquePatients.values()));
       } catch (error) {
         console.error(error);
+        setPatients([]);
       } finally {
         setLoading(false);
       }
@@ -48,7 +51,7 @@ export default function MyPatientsPage() {
         <Link href="/dashboard/doctor">
           <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">My Patients</h1>
+        <h1 className="text-3xl font-bold text-white">My Patients</h1>
       </div>
 
       {loading ? (
@@ -60,7 +63,7 @@ export default function MyPatientsPage() {
           <CardSkeleton />
           <CardSkeleton />
         </div>
-      ) : patients.length === 0 ? (
+      ) : (Array.isArray(patients) ? patients : []).length === 0 ? (
         <Card>
           <CardContent className="text-center py-12 text-slate-500">
             <Users className="mx-auto mb-3 opacity-20" size={48} />
@@ -70,7 +73,7 @@ export default function MyPatientsPage() {
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {patients.map((patient) => (
+          {(Array.isArray(patients) ? patients : []).map((patient) => (
             <Card key={patient._id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-4">

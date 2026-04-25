@@ -112,7 +112,7 @@ export default function SignupPage() {
   const labelClassName = "text-sm font-medium text-neutral-300";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-[#080c14] p-4 py-12">
       {/* Background gradient effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>

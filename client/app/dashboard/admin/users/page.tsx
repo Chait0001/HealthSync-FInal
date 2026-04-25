@@ -23,8 +23,9 @@ export default function AllUsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const { data } = await api.get('/admin/users');
-      setUsers(data);
+      const response = await api.get('/admin/users');
+      const data = response.data.data || response.data;
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -46,9 +47,10 @@ export default function AllUsersPage() {
     }
   };
 
+  const usersList = Array.isArray(users) ? users : [];
   const filteredUsers = filter === 'all'
-    ? users
-    : users.filter(u => u.role === filter);
+    ? usersList
+    : usersList.filter(u => u.role === filter);
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -64,7 +66,7 @@ export default function AllUsersPage() {
         <Link href="/dashboard/admin">
           <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">All Users</h1>
+        <h1 className="text-3xl font-bold text-white">All Users</h1>
       </div>
 
       <div className="flex gap-2">

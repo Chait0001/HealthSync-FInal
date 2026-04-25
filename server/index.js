@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const { errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
 
@@ -24,5 +25,7 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => console.log(`Server started on port ${port}`));

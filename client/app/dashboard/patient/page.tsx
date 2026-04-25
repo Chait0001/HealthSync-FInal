@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/services/api';
-import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Skeleton, AppointmentCardSkeleton, StatCardSkeleton } from '@/components/ui/Skeleton';
-import { Calendar, Plus } from 'lucide-react';
+import { AppointmentCardSkeleton } from '@/components/ui/Skeleton';
+import { Calendar, Plus, Clock } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface Appointment {
   _id: string;
@@ -20,16 +20,19 @@ interface Appointment {
 }
 
 export default function PatientDashboard() {
+  const { user } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const { data } = await api.get('/appointments/my');
-        setAppointments(data);
+        const response = await api.get('/appointments/my');
+        const data = response.data.data || response.data;
+        setAppointments(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
+        setAppointments([]);
       } finally {
         setLoading(false);
       }
@@ -37,76 +40,156 @@ export default function PatientDashboard() {
     fetchAppointments();
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'approved': return 'text-green-600 bg-green-50';
-      case 'cancelled': return 'text-red-600 bg-red-50';
-      case 'completed': return 'text-slate-600 bg-slate-50';
-      default: return 'text-yellow-600 bg-yellow-50';
-    }
+  const appointmentsList = Array.isArray(appointments) ? appointments : [];
+  const upcomingCount = appointmentsList.filter(a => a.status !== 'cancelled' && a.status !== 'completed').length;
+  
+  const stats = {
+    total: appointmentsList.length,
+    upcoming: upcomingCount
   };
-
-  const upcomingCount = appointments.filter(a => a.status !== 'cancelled' && a.status !== 'completed').length;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">Patient Dashboard</h1>
+        <h1 className="text-3xl font-bold text-white">Patient Dashboard</h1>
         <Link href="/dashboard/patient/book">
-          <Button className="gap-2">
+          <Button className="gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 border-none shadow-lg shadow-blue-500/20">
             <Plus size={16} /> Book Appointment
           </Button>
         </Link>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {loading ? (
-          <StatCardSkeleton />
-        ) : (
-          <Card className="bg-blue-500 text-white border-none">
-            <CardContent className="pt-6">
-              <div className="text-blue-100 mb-2">Upcoming Appointments</div>
-              <div className="text-4xl font-bold">{upcomingCount}</div>
-            </CardContent>
-          </Card>
-        )}
+      {/* Welcoming banner with patient illustration */}
+      <div className="relative bg-gradient-to-r from-blue-600/20 to-purple-600/10 border border-blue-500/10 rounded-2xl p-8 mb-8 overflow-hidden shadow-lg shadow-blue-500/5">
+        {/* Patient SVG — person sitting, relaxed */}
+        <div className="absolute right-8 bottom-0 animate-float hidden md:block opacity-90">
+          <svg width="110" height="130" viewBox="0 0 110 130" className="drop-shadow-2xl">
+            <circle cx="55" cy="25" r="18" fill="#f5c5a3"/>
+            <rect x="30" y="43" width="50" height="55" fill="#3b82f6" rx="5"/>
+            <rect x="40" y="98" width="12" height="25" fill="#1d4ed8"/>
+            <rect x="58" y="98" width="12" height="25" fill="#1d4ed8"/>
+          </svg>
+        </div>
+        
+        <div className="relative z-10 md:w-2/3">
+          <h2 className="text-3xl font-bold text-white mb-2">Welcome back, {user?.name || 'Guest'}! 🌟</h2>
+          <p className="text-neutral-400 text-lg max-w-xl">Your health, your priority. Track your appointments and medical history here.</p>
+          
+          <div className="flex flex-wrap gap-4 mt-8">
+            <div className="bg-[#080c14]/40 backdrop-blur-md border border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
+              <div className="p-3 bg-blue-500/20 text-blue-400 rounded-lg">
+                <Calendar size={20} />
+              </div>
+              <div>
+                <p className="text-sm text-neutral-400 font-medium">My Appointments</p>
+                <p className="text-2xl font-bold text-white">{stats.total}</p>
+              </div>
+            </div>
+            
+            <div className="bg-[#080c14]/40 backdrop-blur-md border border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
+              <div className="p-3 bg-teal-500/20 text-teal-400 rounded-lg">
+                <Clock size={20} />
+              </div>
+              <div>
+                <p className="text-sm text-neutral-400 font-medium">Upcoming</p>
+                <p className="text-2xl font-bold text-white">{stats.upcoming}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
-        <h2 className="text-lg font-semibold mb-4">My Appointments</h2>
+      {/* Appointments Table */}
+      <div className="bg-[#0d1117] border border-white/5 rounded-2xl overflow-hidden shadow-xl">
+        <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+          <h3 className="font-semibold text-lg text-white">My Appointments</h3>
+        </div>
 
         {loading ? (
-          <div className="space-y-4">
-            <AppointmentCardSkeleton />
+          <div className="p-6 space-y-4">
             <AppointmentCardSkeleton />
             <AppointmentCardSkeleton />
           </div>
-        ) : appointments.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <Calendar className="mx-auto mb-3 opacity-20" size={48} />
-            <p>No appointments scheduled</p>
+        ) : appointmentsList.length === 0 ? (
+          <div className="text-center py-16 px-6">
+            <div className="flex justify-center mb-6 opacity-80 animate-float">
+              {/* Empty state SVG */}
+              <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-blue-500/50">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <path d="M8 14h.01" />
+                <path d="M12 14h.01" />
+                <path d="M16 14h.01" />
+                <path d="M8 18h.01" />
+                <path d="M12 18h.01" />
+                <path d="M16 18h.01" />
+              </svg>
+            </div>
+            <p className="text-xl font-semibold text-white mb-2">No Appointments</p>
+            <p className="text-neutral-500 max-w-sm mx-auto mb-6">You don't have any appointments scheduled yet. Book your first appointment to get started.</p>
+            <Link href="/dashboard/patient/book">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white border-none">
+                Book Appointment
+              </Button>
+            </Link>
           </div>
         ) : (
-          <div className="space-y-4">
-            {appointments.map((apt) => (
-              <div key={apt._id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-blue-100 text-blue-600 rounded-full">
-                    <Calendar size={20} />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Dr. {apt.doctorId?.userId?.name || 'Unknown'}</p>
-                    <p className="text-sm text-muted-foreground">{apt.doctorId?.specialization || 'General'}</p>
-                    <p className="text-xs text-muted-foreground/70">
-                      {new Date(apt.date).toLocaleDateString()} at {new Date(apt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(apt.status)}`}>
-                  {apt.status}
-                </span>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-neutral-400 uppercase bg-black/20 border-b border-white/5">
+                <tr>
+                  <th className="px-6 py-4 font-medium tracking-wider">Doctor</th>
+                  <th className="px-6 py-4 font-medium tracking-wider">Date & Time</th>
+                  <th className="px-6 py-4 font-medium tracking-wider">Reason</th>
+                  <th className="px-6 py-4 font-medium tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {appointmentsList.map((apt) => (
+                  <tr key={apt._id} className="hover:bg-white/[0.03] transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm shadow-sm">
+                          {apt.doctorId?.userId?.name?.charAt(0) || 'D'}
+                        </div>
+                        <div>
+                          <p className="font-medium text-white">Dr. {apt.doctorId?.userId?.name || 'Unknown'}</p>
+                          <p className="text-xs text-neutral-500 mt-0.5">{apt.doctorId?.specialization || 'General'}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-white font-medium">{new Date(apt.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                      <p className="text-xs text-neutral-500 mt-0.5 flex items-center gap-1">
+                        <Clock size={12} />
+                        {new Date(apt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-neutral-300 max-w-[250px] truncate" title={apt.reason}>{apt.reason}</p>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border items-center gap-1.5 w-fit ${
+                        apt.status === 'approved' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                        apt.status === 'cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 
+                        apt.status === 'completed' ? 'bg-slate-500/10 text-slate-400 border-slate-500/20' :
+                        'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          apt.status === 'approved' ? 'bg-green-400' :
+                          apt.status === 'cancelled' ? 'bg-red-400' : 
+                          apt.status === 'completed' ? 'bg-slate-400' :
+                          'bg-yellow-400'
+                        }`}></span>
+                        {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

@@ -26,10 +26,12 @@ export default function MyAppointmentsPage() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const { data } = await api.get('/appointments/my');
-        setAppointments(data);
+        const response = await api.get('/appointments/my');
+        const data = response.data.data || response.data;
+        setAppointments(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
+        setAppointments([]);
       } finally {
         setLoading(false);
       }
@@ -46,6 +48,8 @@ export default function MyAppointmentsPage() {
     }
   };
 
+  const appointmentsList = Array.isArray(appointments) ? appointments : [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -53,7 +57,7 @@ export default function MyAppointmentsPage() {
           <Link href="/dashboard/patient">
             <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900">My Appointments</h1>
+          <h1 className="text-3xl font-bold text-white">My Appointments</h1>
         </div>
         <Link href="/dashboard/patient/book">
           <Button className="gap-2"><Plus size={16} /> Book New</Button>
@@ -67,7 +71,7 @@ export default function MyAppointmentsPage() {
           <AppointmentCardSkeleton />
           <AppointmentCardSkeleton />
         </div>
-      ) : appointments.length === 0 ? (
+      ) : appointmentsList.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12 text-slate-500">
             <Calendar className="mx-auto mb-3 opacity-20" size={48} />
@@ -79,7 +83,7 @@ export default function MyAppointmentsPage() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {appointments.map((apt) => (
+          {appointmentsList.map((apt) => (
             <Card key={apt._id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">

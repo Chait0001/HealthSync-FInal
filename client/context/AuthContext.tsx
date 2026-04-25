@@ -41,28 +41,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { data } = await api.post('/auth/login', { email, password });
+    const response = await api.post('/auth/login', { email, password });
+    const userData = response.data.data || response.data; // Handle both standard and wrapped responses
 
-    localStorage.setItem('user', JSON.stringify(data));
-    localStorage.setItem('token', data.token);
-    setUser(data);
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token);
+    setUser(userData);
 
     // Redirect based on role
-    if (data.role === 'admin') router.push('/dashboard/admin');
-    else if (data.role === 'doctor') router.push('/dashboard/doctor');
+    if (userData.role === 'admin') router.push('/dashboard/admin');
+    else if (userData.role === 'doctor') router.push('/dashboard/doctor');
     else router.push('/dashboard/patient');
   };
 
-  const register = async (userData: any) => {
-    const { data } = await api.post('/auth/register', userData);
+  const register = async (submitData: any) => {
+    const response = await api.post('/auth/register', submitData);
+    const userData = response.data.data || response.data;
 
-    localStorage.setItem('user', JSON.stringify(data));
-    localStorage.setItem('token', data.token);
-    setUser(data);
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token);
+    setUser(userData);
 
     // Redirect based on role
-    if (data.role === 'admin') router.push('/dashboard/admin');
-    else if (data.role === 'doctor') router.push('/dashboard/doctor');
+    if (userData.role === 'admin') router.push('/dashboard/admin');
+    else if (userData.role === 'doctor') router.push('/dashboard/doctor');
     else router.push('/dashboard/patient');
   };
 

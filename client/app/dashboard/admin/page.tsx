@@ -4,10 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
-import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Plus, Users, Stethoscope, Calendar, Trash2 } from 'lucide-react';
-import { Skeleton, TableRowSkeleton } from '@/components/ui/Skeleton';
+import { Users, Stethoscope, Trash2, Shield, Activity } from 'lucide-react';
+import { TableRowSkeleton } from '@/components/ui/Skeleton';
 
 interface Stats {
   totalUsers: number;
@@ -42,10 +41,14 @@ export default function AdminDashboard() {
         api.get('/admin/stats'),
         api.get('/admin/users')
       ]);
-      setStats(statsRes.data);
-      setUsers(usersRes.data);
+      const statsData = statsRes.data.data || statsRes.data;
+      const usersData = usersRes.data.data || usersRes.data;
+      
+      setStats(statsData || { totalUsers: 0, totalDoctors: 0, totalPatients: 0 });
+      setUsers(Array.isArray(usersData) ? usersData : []);
     } catch (error) {
       console.error("Failed to fetch admin data", error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -69,72 +72,85 @@ export default function AdminDashboard() {
 
   // Show nothing while checking auth or if not admin
   if (authLoading || !user || user.role !== 'admin') {
-    return <div className="flex items-center justify-center h-64">Loading...</div>;
+    return <div className="flex items-center justify-center h-64"><div className="animate-pulse flex items-center gap-2"><Shield className="text-purple-500 animate-spin" /><span className="text-muted-foreground">Verifying Admin Access...</span></div></div>;
   }
+
+  const usersList = Array.isArray(users) ? users : [];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-none">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Users size={24} />
+      {/* Admin banner with cartoon SVG */}
+      <div className="relative bg-gradient-to-r from-purple-600/20 to-pink-600/10 border border-purple-500/10 rounded-2xl p-8 mb-8 overflow-hidden shadow-lg shadow-purple-500/5">
+        {/* Admin cartoon SVG — person with clipboard/laptop */}
+        <div className="absolute right-8 bottom-0 animate-float hidden md:block opacity-90">
+          <svg width="140" height="160" viewBox="0 0 120 140" className="drop-shadow-2xl">
+            <circle cx="60" cy="22" r="18" fill="#f5c5a3"/>
+            <rect x="35" y="40" width="50" height="95" fill="#7c3aed" rx="5"/>
+            <rect x="42" y="55" width="36" height="25" fill="#ddd6fe" rx="3"/> {/* laptop/clipboard */}
+            <rect x="45" y="58" width="30" height="2" fill="#7c3aed"/>
+            <rect x="45" y="63" width="22" height="2" fill="#7c3aed"/>
+            <rect x="45" y="68" width="26" height="2" fill="#7c3aed"/>
+          </svg>
+        </div>
+        
+        <div className="relative z-10 md:w-2/3">
+          <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">Admin Control Center <Shield className="text-purple-400" size={28} /></h2>
+          <p className="text-neutral-400 text-lg max-w-xl">Manage your entire healthcare ecosystem, monitor users, and oversee system health.</p>
+          
+          <div className="flex flex-wrap gap-4 mt-8">
+            <div className="bg-[#080c14]/40 backdrop-blur-md border border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
+              <div className="p-3 bg-purple-500/20 text-purple-400 rounded-lg">
+                <Stethoscope size={20} />
               </div>
               <div>
-                <div className="text-blue-100">Total Users</div>
-                <div className="text-3xl font-bold">{stats.totalUsers}</div>
+                <p className="text-sm text-neutral-400 font-medium">Total Doctors</p>
+                <p className="text-2xl font-bold text-white">{stats?.totalDoctors || 0}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-none">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Stethoscope size={24} />
+            
+            <div className="bg-[#080c14]/40 backdrop-blur-md border border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
+              <div className="p-3 bg-teal-500/20 text-teal-400 rounded-lg">
+                <Users size={20} />
               </div>
               <div>
-                <div className="text-green-100">Total Doctors</div>
-                <div className="text-3xl font-bold">{stats.totalDoctors}</div>
+                <p className="text-sm text-neutral-400 font-medium">Total Patients</p>
+                <p className="text-2xl font-bold text-white">{stats?.totalPatients || 0}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-none">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Calendar size={24} />
+            
+            <div className="bg-[#080c14]/40 backdrop-blur-md border border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
+              <div className="p-3 bg-pink-500/20 text-pink-400 rounded-lg">
+                <Activity size={20} />
               </div>
               <div>
-                <div className="text-purple-100">Total Patients</div>
-                <div className="text-3xl font-bold">{stats.totalPatients}</div>
+                <p className="text-sm text-neutral-400 font-medium">Total Users</p>
+                <p className="text-2xl font-bold text-white">{stats?.totalUsers || 0}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-card rounded-lg border border-border shadow-sm">
-        <div className="p-4 border-b border-border">
-          <h2 className="text-lg font-semibold">All Users</h2>
+      <div className="bg-[#0d1117] border border-white/5 rounded-2xl overflow-hidden shadow-xl">
+        <div className="p-6 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+          <h3 className="font-semibold text-lg text-white">System Users</h3>
+          <span className="bg-purple-500/10 text-purple-400 text-xs px-3 py-1 rounded-full border border-purple-500/20 font-medium">Global Directory</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-muted">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs text-neutral-400 uppercase bg-black/20 border-b border-white/5">
               <tr>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Name</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Email</th>
-                <th className="text-left p-4 text-sm font-medium text-muted-foreground">Role</th>
-                <th className="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
+                <th className="px-6 py-4 font-medium tracking-wider">User</th>
+                <th className="px-6 py-4 font-medium tracking-wider">Email</th>
+                <th className="px-6 py-4 font-medium tracking-wider">Role</th>
+                <th className="px-6 py-4 font-medium tracking-wider text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-white/5">
               {loading ? (
                 <>
                   <TableRowSkeleton />
@@ -142,27 +158,49 @@ export default function AdminDashboard() {
                   <TableRowSkeleton />
                 </>
               ) : (
-                users.map((u) => (
-                  <tr key={u._id} className="border-t border-border hover:bg-muted/50">
-                    <td className="p-4">{u.name}</td>
-                    <td className="p-4 text-muted-foreground">{u.email}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${u.role === 'admin' ? 'bg-red-100 text-red-700' :
-                          u.role === 'doctor' ? 'bg-green-100 text-green-700' :
-                            'bg-blue-100 text-blue-700'
+                usersList.map((u) => (
+                  <tr key={u._id} className="hover:bg-white/[0.03] transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shadow-sm ${
+                          u.role === 'admin' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/20' :
+                          u.role === 'doctor' ? 'bg-teal-500/20 text-teal-400 border border-teal-500/20' :
+                          'bg-blue-500/20 text-blue-400 border border-blue-500/20'
                         }`}>
-                        {u.role}
+                          {u.name.charAt(0)}
+                        </div>
+                        <p className="font-medium text-white">{u.name}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-neutral-400">{u.email}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 w-fit ${
+                          u.role === 'admin' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                          u.role === 'doctor' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' :
+                          'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                        }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          u.role === 'admin' ? 'bg-purple-400' :
+                          u.role === 'doctor' ? 'bg-teal-400' :
+                          'bg-blue-400'
+                        }`}></span>
+                        {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
                       </span>
                     </td>
-                    <td className="p-4 text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleDeleteUser(u._id)}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
+                    <td className="px-6 py-4 text-right">
+                      {u.role !== 'admin' && (
+                        <div className="flex justify-end opacity-50 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 bg-transparent border border-transparent hover:border-red-500/20 h-8 px-2"
+                            onClick={() => handleDeleteUser(u._id)}
+                            title="Delete User"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))

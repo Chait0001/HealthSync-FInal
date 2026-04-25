@@ -28,10 +28,12 @@ export default function ManageDoctorsPage() {
 
   const fetchDoctors = async () => {
     try {
-      const { data } = await api.get('/admin/doctors');
-      setDoctors(data);
+      const response = await api.get('/admin/doctors');
+      const data = response.data.data || response.data;
+      setDoctors(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
+      setDoctors([]);
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ export default function ManageDoctorsPage() {
         <Link href="/dashboard/admin">
           <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Manage Doctors</h1>
+        <h1 className="text-3xl font-bold text-white">Manage Doctors</h1>
       </div>
 
       {loading ? (
@@ -69,16 +71,16 @@ export default function ManageDoctorsPage() {
           <DoctorCardSkeleton />
           <DoctorCardSkeleton />
         </div>
-      ) : doctors.length === 0 ? (
+      ) : (Array.isArray(doctors) ? doctors : []).length === 0 ? (
         <Card>
-          <CardContent className="text-center py-12 text-slate-500">
+          <CardContent className="text-center py-12 text-neutral-400">
             <Stethoscope className="mx-auto mb-3 opacity-20" size={48} />
             <p>No doctors registered yet</p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {doctors.map((doctor) => (
+          {(Array.isArray(doctors) ? doctors : []).map((doctor) => (
             <Card key={doctor._id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">

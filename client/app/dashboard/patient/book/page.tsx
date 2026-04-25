@@ -51,10 +51,12 @@ export default function BookAppointmentPage() {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const { data } = await api.get('/doctors');
-        setDoctors(data);
+        const response = await api.get('/doctors');
+        const data = response.data.data || response.data;
+        setDoctors(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Failed to fetch doctors", error);
+        setDoctors([]);
       } finally {
         setLoading(false);
       }
@@ -68,8 +70,9 @@ export default function BookAppointmentPage() {
     
     const possibleSpecs = CONCERN_MAPPING[concern] || ['General'];
     
+    const doctorsList = Array.isArray(doctors) ? doctors : [];
     // Find all doctors matching specialization
-    const matches = doctors.filter(doc => 
+    const matches = doctorsList.filter(doc => 
       possibleSpecs.some(spec => doc.specialization.toLowerCase().includes(spec.toLowerCase()))
     );
     
@@ -124,7 +127,7 @@ export default function BookAppointmentPage() {
       
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Book an Appointment</h1>
+        <h1 className="text-3xl font-bold text-white">Book an Appointment</h1>
         <p className="text-muted-foreground mt-2">Intelligent matching for your health needs.</p>
       </div>
 
@@ -285,7 +288,7 @@ export default function BookAppointmentPage() {
                 onChange={(e) => setSelectedDoctorId(e.target.value)}
               >
                 <option value="" disabled>Select a doctor manually</option>
-                {doctors.map((doctor) => (
+                {(Array.isArray(doctors) ? doctors : []).map((doctor) => (
                   <option key={doctor._id} value={doctor._id}>
                     Dr. {doctor.userId.name} - {doctor.specialization} (${doctor.feesPerConsultation})
                   </option>
@@ -313,7 +316,7 @@ export default function BookAppointmentPage() {
              </div>
              
              <div className="p-4 bg-muted/30 rounded-lg border border-border mb-6">
-                <p className="font-semibold text-foreground">Booking with: <span className="font-normal text-muted-foreground">Dr. {doctors.find(d => d._id === selectedDoctorId)?.userId.name}</span></p>
+                <p className="font-semibold text-foreground">Booking with: <span className="font-normal text-muted-foreground">Dr. {(Array.isArray(doctors) ? doctors : []).find(d => d._id === selectedDoctorId)?.userId.name}</span></p>
                 <p className="font-semibold text-foreground">For: <span className="font-normal text-muted-foreground">"{concern}"</span></p>
              </div>
 

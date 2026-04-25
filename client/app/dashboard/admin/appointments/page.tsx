@@ -39,8 +39,9 @@ export default function VerifyAppointmentsPage() {
     setLoading(true);
     setAppointments([]);
     try {
-      const { data } = await api.get(`/admin/appointments/${type}`);
-      setAppointments(data);
+      const response = await api.get(`/admin/appointments/${type}`);
+      const data = response.data.data || response.data;
+      setAppointments(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(`Failed to fetch ${type} appointments`, error);
     } finally {
@@ -86,7 +87,7 @@ export default function VerifyAppointmentsPage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
       <div className="mb-4">
-        <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+        <h1 className="text-3xl font-bold text-white flex items-center gap-2">
           Manage Appointments
         </h1>
         <p className="text-muted-foreground mt-2">Manage customer appointment requests and view confirmed schedules.</p>
@@ -121,7 +122,7 @@ export default function VerifyAppointmentsPage() {
            <Skeleton className="h-40 w-full rounded-xl" />
            <Skeleton className="h-40 w-full rounded-xl" />
         </div>
-      ) : appointments.length === 0 ? (
+      ) : (Array.isArray(appointments) ? appointments : []).length === 0 ? (
         <Card className="p-12 text-center border-dashed bg-card/50">
            {activeTab === 'pending' ? (
               <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500 opacity-80" />
@@ -139,7 +140,7 @@ export default function VerifyAppointmentsPage() {
         </Card>
       ) : (
         <div className="space-y-6">
-          {appointments.map((apt) => {
+          {(Array.isArray(appointments) ? appointments : []).map((apt) => {
             const { date, time } = formatDateTime(apt.date);
             return (
               <Card key={apt._id} className="p-6 bg-card border-border hover:shadow-lg transition-shadow duration-300">

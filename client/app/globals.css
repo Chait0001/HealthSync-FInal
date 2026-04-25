@@ -61,6 +61,20 @@
   animation: shimmer 1.5s infinite;
 }
 
+/* Float Animation for Hero Dashboard Card */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* Pulse Glow Animation */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(20, 184, 166, 0.3); }
+}
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
 :root {
   --radius: 0.625rem;
   --background: oklch(0.99 0.02 95);
@@ -97,7 +111,7 @@
 }
 
 .dark {
-  --background: oklch(0 0 0);
+  --background: #080c14;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
