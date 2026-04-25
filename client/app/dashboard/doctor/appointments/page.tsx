@@ -61,7 +61,7 @@ export default function DoctorAppointmentsPage() {
         <Link href="/dashboard/doctor">
           <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
         </Link>
-        <h1 className="text-3xl font-bold text-white">All Appointments</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">All Appointments</h1>
       </div>
 
       <div className="flex gap-2">
@@ -103,8 +103,8 @@ export default function DoctorAppointmentsPage() {
                       <Users size={24} />
                     </div>
                     <div>
-                      <p className="font-semibold text-lg">{apt.patientId?.name || 'Unknown Patient'}</p>
-                      <p className="text-slate-600">{apt.reason}</p>
+                      <p className="font-semibold text-lg text-slate-900 dark:text-white">{apt.patientId?.name || 'Unknown Patient'}</p>
+                      <p className="text-slate-700 dark:text-slate-400">{apt.reason}</p>
                       <p className="text-sm text-slate-500 mt-1">
                         {new Date(apt.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                         {' at '}

@@ -51,7 +51,7 @@ export default function MyPatientsPage() {
         <Link href="/dashboard/doctor">
           <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
         </Link>
-        <h1 className="text-3xl font-bold text-white">My Patients</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">My Patients</h1>
       </div>
 
       {loading ? (
@@ -81,7 +81,7 @@ export default function MyPatientsPage() {
                     {patient.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-semibold">{patient.name}</p>
+                    <p className="font-semibold text-slate-900 dark:text-white">{patient.name}</p>
                     <p className="text-sm text-slate-500">{patient.email}</p>
                   </div>
                 </div>
