@@ -163,17 +163,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (user.role === 'admin') links = adminLinks;
 
   return (
-    <div className="flex h-screen bg-[#080c14] text-white">
+    <div className="flex h-screen bg-slate-50 dark:bg-[#080c14] text-slate-900 dark:text-white">
       {/* Sidebar */}
-      <aside className={`bg-[#0d1117] border-r border-white/5 shadow-2xl transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} flex flex-col z-20`}>
-        <div className="h-20 p-6 border-b border-white/5 flex items-center justify-between">
+      <aside className={`bg-white dark:bg-[#0d1117] border-r border-slate-200 dark:border-white/5 shadow-sm dark:shadow-2xl transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} flex flex-col z-20`}>
+        <div className="h-20 p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
           <Link href="/" className={`flex items-center gap-2 ${!isSidebarOpen && 'hidden'}`}>
-            <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/20">
+            <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/20">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
             </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">HealthSync</span>
+            <span className="font-bold text-xl bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">HealthSync</span>
           </Link>
-          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-md hover:bg-white/5 text-neutral-400 hover:text-white transition-colors lg:hidden">
+          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-md hover:bg-slate-50 dark:hover:bg-white/5 text-slate-400 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors lg:hidden">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
         </div>
@@ -187,28 +187,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 href={link.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? 'bg-teal-500/10 border-l-2 border-teal-400 text-teal-400 shadow-[0_0_15px_rgba(20,184,166,0.1)]'
-                    : 'text-neutral-400 hover:bg-white/5 hover:text-white hover:shadow-[0_0_10px_rgba(20,184,166,0.05)]'
+                    ? 'bg-teal-50 dark:bg-teal-500/10 border-l-2 border-teal-600 dark:border-teal-400 text-teal-700 dark:text-teal-400 shadow-sm dark:shadow-[0_0_15px_rgba(20,184,166,0.1)]'
+                    : 'text-slate-600 dark:text-neutral-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white'
                 }`}
               >
-                <link.icon size={20} className={isActive ? 'text-teal-400' : ''} />
+                <link.icon size={20} className={isActive ? 'text-teal-600 dark:text-teal-400' : ''} />
                 <span className={`${!isSidebarOpen && 'hidden'} font-medium`}>{link.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-white/5 bg-[#0a0f18]/50">
+        <div className="p-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0a0f18]/50">
           <div className={`flex items-center gap-3 mb-4 ${!isSidebarOpen && 'justify-center'}`}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-blue-500/20 border border-teal-500/20 flex items-center justify-center text-teal-400 font-bold shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-500/20 border border-teal-100 dark:border-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold shadow-sm">
               {user.name?.charAt(0) || 'U'}
             </div>
             <div className={`${!isSidebarOpen && 'hidden'}`}>
-              <p className="text-sm font-semibold text-white">{user.name || 'User'}</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white">{user.name || 'User'}</p>
               <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                user.role === 'admin' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/20' :
-                user.role === 'doctor' ? 'bg-teal-500/20 text-teal-400 border border-teal-500/20' :
-                'bg-blue-500/20 text-blue-400 border border-blue-500/20'
+                user.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20' :
+                user.role === 'doctor' ? 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400 border border-teal-200 dark:border-teal-500/20' :
+                'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
               }`}>
                 {user.role}
               </span>

@@ -119,12 +119,12 @@ export default function SignupPage() {
     }
   };
 
-  const inputClassName = "bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-emerald-500 focus:ring-emerald-500/20";
-  const selectClassName = "flex h-10 w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500";
-  const labelClassName = "text-sm font-medium text-neutral-300";
+  const inputClassName = "bg-slate-50 dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-teal-500 dark:focus:border-teal-400 rounded-xl px-4 py-3 w-full";
+  const selectClassName = "bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-teal-500/20";
+  const labelClassName = "text-slate-700 dark:text-slate-300 text-sm font-medium";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#080c14] p-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#080c14] p-4 py-12 transition-colors duration-500">
       {/* Background gradient effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
@@ -148,8 +148,8 @@ export default function SignupPage() {
         >
           <div className="p-8">
             <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-white mb-2">Create Account</h1>
-              <p className="text-neutral-400">Join HealthSync today</p>
+              <h1 className="text-slate-900 dark:text-white font-bold text-2xl mb-2">Create Account</h1>
+              <p className="text-slate-500 dark:text-slate-400">Join HealthSync today</p>
               {step === 2 && (
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <div className="w-8 h-1 rounded-full bg-emerald-500"></div>
@@ -158,8 +158,8 @@ export default function SignupPage() {
               )}
               {step === 1 && (
                 <div className="flex items-center justify-center gap-2 mt-2">
-                  <div className="w-8 h-1 rounded-full bg-emerald-500"></div>
-                  <div className="w-8 h-1 rounded-full bg-neutral-700"></div>
+                  <div className="w-8 h-1 rounded-full bg-teal-600 dark:bg-teal-500"></div>
+                  <div className="w-8 h-1 rounded-full bg-slate-200 dark:bg-slate-700"></div>
                 </div>
               )}
             </div>
@@ -205,7 +205,7 @@ export default function SignupPage() {
                       <PasswordInput name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required className={inputClassName} />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full mt-4 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600" disabled={isLoading}>
+                  <Button type="submit" className="w-full mt-4 bg-teal-600 dark:bg-teal-500 hover:bg-teal-700 dark:hover:bg-teal-600 text-white font-bold py-3 rounded-xl transition-all" disabled={isLoading}>
                     {isLoading ? <Loader2 className="animate-spin mr-2" /> : formData.role === 'admin' ? 'Create Admin Account' : 'Next: Profile Details'}
                   </Button>
                 </>
@@ -289,10 +289,10 @@ export default function SignupPage() {
                   )}
 
                   <div className="flex gap-3 mt-6">
-                    <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1 border-neutral-700 text-neutral-300 hover:bg-neutral-800">
+                    <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl py-3">
                       Back
                     </Button>
-                    <Button type="submit" disabled={isLoading} className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600">
+                    <Button type="submit" disabled={isLoading} className="flex-1 bg-teal-600 dark:bg-teal-500 hover:bg-teal-700 dark:hover:bg-teal-600 text-white font-bold py-3 rounded-xl transition-all">
                       {isLoading ? <Loader2 className="animate-spin mr-2" /> : 'Create Account'}
                     </Button>
                   </div>
@@ -300,9 +300,9 @@ export default function SignupPage() {
               )}
             </form>
 
-            <div className="mt-6 text-center text-sm text-neutral-400">
+            <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
               Already have an account?{' '}
-              <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-medium">
+              <Link href="/login" className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium">
                 Sign in
               </Link>
             </div>

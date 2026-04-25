@@ -31,7 +31,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#080c14] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#080c14] p-4 transition-colors duration-500">
       {/* Background gradient effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
@@ -55,8 +55,8 @@ export default function LoginPage() {
         >
           <div className="p-8">
             <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
-              <p className="text-neutral-400">Sign in to your account</p>
+              <h1 className="text-slate-900 dark:text-white font-bold text-2xl mb-2">Welcome Back</h1>
+              <p className="text-slate-500 dark:text-slate-400">Sign in to your account</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -67,24 +67,24 @@ export default function LoginPage() {
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-300">Email</label>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-emerald-500 focus:ring-emerald-500/20"
-                />
+                <label className="text-slate-700 dark:text-slate-300 text-sm font-medium">Email</label>
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="bg-slate-50 dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-teal-500 dark:focus:border-teal-400 rounded-xl px-4 py-3 w-full"
+                  />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-300">Password</label>
+                <label className="text-slate-700 dark:text-slate-300 text-sm font-medium">Password</label>
                 <PasswordInput
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-emerald-500"
+                  className="bg-slate-50 dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-teal-500 dark:focus:border-teal-400 rounded-xl px-4 py-3 w-full"
                 />
               </div>
 
@@ -97,9 +97,9 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center text-sm text-neutral-400">
+            <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
               Don't have an account?{' '}
-              <Link href="/signup" className="text-emerald-400 hover:text-emerald-300 font-medium">
+              <Link href="/signup" className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium">
                 Sign up
               </Link>
             </div>

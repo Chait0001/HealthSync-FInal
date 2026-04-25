@@ -169,7 +169,7 @@ export const NoiseBackground = ({
     <div
       ref={containerRef}
       className={cn(
-        "group relative overflow-hidden rounded-2xl bg-neutral-900 p-[2px]",
+        "group relative overflow-hidden rounded-2xl bg-slate-200 dark:bg-neutral-900 p-[2px] transition-colors duration-300",
         backdropBlur &&
         "after:absolute after:inset-0 after:h-full after:w-full after:backdrop-blur-lg after:content-['']",
         containerClassName,
@@ -223,8 +223,8 @@ export const NoiseBackground = ({
         />
       </div>
 
-      {/* Content with dark background */}
-      <div className={cn("relative z-10 rounded-[14px] bg-neutral-950", className)}>
+      {/* Content with themed background */}
+      <div className={cn("relative z-10 rounded-[14px] bg-white dark:bg-neutral-950 transition-colors duration-300", className)}>
         {children}
       </div>
     </div>

@@ -98,7 +98,7 @@ function DropdownMenu({
     <div className="relative">
       <button
         onClick={onToggle}
-        className="flex items-center gap-1 text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors py-2 cursor-pointer"
+        className="flex items-center gap-1 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 cursor-pointer"
       >
         {label}
         <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -136,7 +136,7 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
 
   return (
     <div className="relative">
-      <div className="overflow-hidden rounded-2xl bg-[#0d1117] border border-white/5 p-8 md:p-12 min-h-[260px]">
+      <div className="overflow-hidden rounded-2xl bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-white/5 p-8 md:p-12 min-h-[260px] shadow-sm">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={current}
@@ -148,17 +148,17 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
           >
             <div className="flex items-center gap-1 mb-6">
               {[...Array(t.rating)].map((_, j) => (
-                <Star key={j} size={18} className="fill-yellow-400 text-yellow-400" />
+                <Star key={j} size={18} className="fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <p className="text-neutral-200 text-xl leading-relaxed mb-8">"{t.content}"</p>
+            <p className="text-slate-700 dark:text-neutral-200 text-xl leading-relaxed mb-8 italic">"{t.content}"</p>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center font-bold text-sm text-white">
+              <div className="w-12 h-12 rounded-full bg-teal-600 dark:bg-gradient-to-br dark:from-emerald-500 dark:to-cyan-500 flex items-center justify-center font-bold text-sm text-white">
                 {t.initials}
               </div>
               <div>
-                <div className="font-semibold text-white">{t.name}</div>
-                <div className="text-sm text-neutral-400">{t.role}</div>
+                <div className="font-semibold text-slate-900 dark:text-white">{t.name}</div>
+                <div className="text-sm text-slate-500 dark:text-neutral-400">{t.role}</div>
               </div>
             </div>
           </motion.div>
@@ -169,7 +169,7 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
       <div className="flex items-center justify-between mt-6">
         <button
           onClick={() => go((current - 1 + testimonials.length) % testimonials.length)}
-          className="w-10 h-10 rounded-full border border-white/10 hover:border-emerald-500/50 flex items-center justify-center text-neutral-400 hover:text-white transition-all"
+          className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 hover:border-teal-300 dark:hover:border-emerald-500/50 flex items-center justify-center text-slate-600 dark:text-neutral-400 hover:bg-teal-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white transition-all"
         >
           &#8592;
         </button>
@@ -178,13 +178,13 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
             <button
               key={i}
               onClick={() => go(i)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-emerald-400 w-6' : 'bg-neutral-600 hover:bg-neutral-400'}`}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-teal-600 w-6' : 'bg-slate-300 dark:bg-neutral-600 hover:bg-slate-400 dark:hover:bg-neutral-400'}`}
             />
           ))}
         </div>
         <button
           onClick={() => go((current + 1) % testimonials.length)}
-          className="w-10 h-10 rounded-full border border-white/10 hover:border-emerald-500/50 flex items-center justify-center text-neutral-400 hover:text-white transition-all"
+          className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 hover:border-teal-300 dark:hover:border-emerald-500/50 flex items-center justify-center text-slate-600 dark:text-neutral-400 hover:bg-teal-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white transition-all"
         >
           &#8594;
         </button>
@@ -208,9 +208,9 @@ function HeroDashboardStats() {
   }, []);
 
   const stats = [
-    { label: 'Patients Today', value: patients, prefix: '', color: 'bg-emerald-500/20 text-emerald-400' },
-    { label: 'Pending', value: pending, prefix: '', color: 'bg-yellow-500/20 text-yellow-400' },
-    { label: 'Revenue', value: revenue, prefix: '$', color: 'bg-cyan-500/20 text-cyan-400' },
+    { label: 'Patients Today', value: patients, prefix: '', color: 'bg-teal-50 dark:bg-emerald-500/20 text-teal-700 dark:text-emerald-400' },
+    { label: 'Pending', value: pending, prefix: '', color: 'bg-amber-50 dark:bg-yellow-500/20 text-amber-700 dark:text-yellow-400' },
+    { label: 'Revenue', value: revenue, prefix: '$', color: 'bg-blue-50 dark:bg-cyan-500/20 text-blue-700 dark:text-cyan-400' },
   ];
 
   return (
@@ -253,12 +253,12 @@ function StatsSection() {
         <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, i) => (
             <AnimatedSection key={i} delay={i * 0.1} direction="up">
-              <div className="bg-[#0d1117] border border-white/5 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300">
-                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+              <div className="bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-white/5 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-teal-300 dark:hover:border-emerald-500/30 hover:shadow-md dark:hover:shadow-emerald-500/10 transition-all duration-300">
+                <div className="text-4xl lg:text-5xl font-bold text-teal-600 dark:text-transparent dark:bg-gradient-to-r dark:from-emerald-400 dark:to-cyan-400 dark:bg-clip-text mb-2">
                   {stat.value.toLocaleString()}{stat.suffix}
                 </div>
-                <div className="text-white font-semibold mb-1">{stat.label}</div>
-                <div className="text-neutral-500 text-sm">{stat.sublabel}</div>
+                <div className="text-slate-700 dark:text-white font-semibold mb-1">{stat.label}</div>
+                <div className="text-slate-500 dark:text-neutral-500 text-sm">{stat.sublabel}</div>
               </div>
             </AnimatedSection>
           ))}
@@ -299,7 +299,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-[#080c14] text-neutral-900 dark:text-white transition-colors duration-300">
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-md bg-[#080c14]/90 border-b border-white/5 shadow-lg' : 'bg-transparent'
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-md bg-white/80 dark:bg-[#080c14]/90 border-b border-slate-200 dark:border-white/5 shadow-sm dark:shadow-lg' : 'bg-transparent'
         }`}>
 
         <div className="max-w-7xl mx-auto px-6">
@@ -329,8 +329,8 @@ export default function LandingPage() {
                     </h4>
                     <div className="space-y-3">
                       {CORE_FEATURES.map((feature) => (
-                        <a key={feature.label} href="#" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-emerald-600 dark:hover:text-white transition-colors group">
-                          <feature.icon size={18} className="text-emerald-500 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
+                        <a key={feature.label} href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors group">
+                          <feature.icon size={18} className="text-teal-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
                           <span>{feature.label}</span>
                         </a>
                       ))}
@@ -342,8 +342,8 @@ export default function LandingPage() {
                     </h4>
                     <div className="space-y-3">
                       {ADVANCED_FEATURES.map((feature) => (
-                        <a key={feature.label} href="#" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-cyan-600 dark:hover:text-white transition-colors group">
-                          <feature.icon size={18} className="text-cyan-500 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
+                        <a key={feature.label} href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors group">
+                          <feature.icon size={18} className="text-teal-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
                           <span>{feature.label}</span>
                         </a>
                       ))}
@@ -376,16 +376,16 @@ export default function LandingPage() {
                       By Practice Size
                     </h4>
                     <div className="space-y-3">
-                      <a href="#" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-cyan-600 dark:hover:text-white transition-colors">
-                        <Stethoscope size={18} className="text-cyan-500 dark:text-cyan-400" />
+                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">
+                        <Stethoscope size={18} className="text-teal-600 dark:text-cyan-400" />
                         Solo Practice
                       </a>
-                      <a href="#" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-cyan-600 dark:hover:text-white transition-colors">
-                        <Users size={18} className="text-cyan-500 dark:text-cyan-400" />
+                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">
+                        <Users size={18} className="text-teal-600 dark:text-cyan-400" />
                         Multi-Doctor Clinic
                       </a>
-                      <a href="#" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-cyan-600 dark:hover:text-white transition-colors">
-                        <Building2 size={18} className="text-cyan-500 dark:text-cyan-400" />
+                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">
+                        <Building2 size={18} className="text-teal-600 dark:text-cyan-400" />
                         Hospital
                       </a>
                     </div>
@@ -411,21 +411,21 @@ export default function LandingPage() {
                 </div>
               </DropdownMenu>
 
-              <a href="#pricing" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">Pricing</a>
-              <a href="#contact" className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">Contact</a>
+              <a href="#pricing" className="text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">Pricing</a>
+              <a href="#contact" className="text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">Contact</a>
             </nav>
 
             {/* CTA Buttons */}
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="hidden md:block px-5 py-2.5 text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white border border-neutral-200 dark:border-neutral-700 rounded-lg hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors"
+                className="hidden md:block px-5 py-2.5 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white border border-slate-300 dark:border-neutral-700 rounded-lg hover:bg-slate-50 dark:hover:border-neutral-600 transition-colors"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="px-5 py-2.5 bg-[#080c14] dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-neutral-800 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-lg font-medium transition-all hover:shadow-lg dark:hover:shadow-emerald-500/25"
+                className="px-5 py-2.5 bg-teal-600 dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-teal-700 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-lg font-medium transition-all hover:shadow-lg dark:hover:shadow-emerald-500/25"
               >
                 Get Started Free
               </Link>
@@ -436,7 +436,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 relative overflow-hidden">
+      <section className="pt-32 pb-20 px-6 relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-teal-50/30 dark:from-transparent dark:via-transparent dark:to-transparent transition-colors duration-500">
         {/* Gradient Mesh Background Blobs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse"></div>
@@ -452,14 +452,14 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-              <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+              <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-slate-900 dark:text-white">
                 Simplify Your Practice with{' '}
-                <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 dark:from-emerald-400 dark:via-cyan-400 dark:to-blue-400 bg-clip-text text-transparent">
                   Powerful Healthcare Software
                 </span>
               </h1>
 
-              <p className="text-xl text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              <p className="text-xl text-slate-600 dark:text-neutral-400 leading-relaxed">
                 All-in-one platform for doctors, clinics, and hospitals to manage appointments,
                 medical records, billing, and patient communication — all from one dashboard.
               </p>
@@ -467,13 +467,13 @@ export default function LandingPage() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-[#080c14] dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-neutral-800 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-xl font-semibold text-lg transition-all hover:shadow-xl dark:hover:shadow-emerald-500/25 hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-teal-700 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-xl font-semibold text-lg transition-all hover:shadow-xl dark:hover:shadow-emerald-500/25 hover:-translate-y-0.5"
                 >
                   <Zap size={20} />
                   Start Free Trial
                 </Link>
-                <button className="inline-flex items-center gap-2 px-8 py-4 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 rounded-xl font-semibold text-lg transition-all hover:bg-neutral-100 dark:hover:bg-neutral-900 text-neutral-900 dark:text-white">
-                  <Play size={20} className="text-emerald-500 dark:text-emerald-400" />
+                <button className="inline-flex items-center gap-2 px-8 py-4 border border-slate-200 dark:border-neutral-700 hover:border-slate-400 dark:hover:border-neutral-600 rounded-xl font-semibold text-lg transition-all hover:bg-slate-50 dark:hover:bg-neutral-900 text-slate-700 dark:text-white">
+                  <Play size={20} className="text-teal-600 dark:text-emerald-400" />
                   Watch Demo
                 </button>
               </div>
@@ -481,12 +481,12 @@ export default function LandingPage() {
 
             {/* Right Content - Dashboard Preview with float animation */}
             <div className="relative animate-float">
-              <div className="bg-neutral-900 rounded-2xl border border-neutral-800 shadow-2xl overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 bg-white/50 dark:bg-[#080c14]/50 border-b border-neutral-200 dark:border-neutral-800">
+              <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-slate-200 dark:border-neutral-800 shadow-2xl overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 bg-slate-50/80 dark:bg-[#080c14]/50 border-b border-slate-200 dark:border-neutral-800">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <span className="ml-4 text-neutral-500 text-sm">HealthSync Dashboard</span>
+                  <span className="ml-4 text-slate-500 text-sm font-medium">HealthSync Dashboard</span>
                 </div>
                 <div className="p-6 space-y-4 bg-white dark:bg-neutral-900">
                   <div className="flex items-center justify-between">
@@ -519,7 +519,7 @@ export default function LandingPage() {
               </div>
 
               {/* Floating notification badge */}
-              <div className="absolute -top-4 -right-4 bg-emerald-500 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
+              <div className="absolute -top-4 -right-4 bg-teal-600 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
                 <span className="flex items-center gap-2 text-sm font-medium">
                   <Check size={16} /> New Patient Added!
                 </span>
@@ -540,11 +540,11 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-emerald-400 font-semibold uppercase tracking-wider text-sm">Features</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">
+            <span className="text-teal-600 dark:text-emerald-400 font-semibold uppercase tracking-wider text-sm">Features</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-slate-900 dark:text-white">
               Everything You Need to Run Your Practice
             </h2>
-            <p className="text-xl text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto">
+            <p className="text-xl text-slate-600 dark:text-neutral-400 max-w-3xl mx-auto">
               From appointment scheduling to billing, HealthSync provides all the tools you need to streamline your healthcare practice.
             </p>
           </div>
@@ -553,8 +553,8 @@ export default function LandingPage() {
             {MAIN_FEATURES.map((feature, i) => (
               <AnimatedSection key={i} delay={i * 0.08} direction="up">
                 <CardSpotlight
-                  className="rounded-2xl bg-[#0d1117] border border-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-teal-500/40 hover:shadow-lg hover:shadow-teal-500/10 h-full"
-                  color="#0d1117"
+                  className="rounded-2xl bg-slate-50 dark:bg-[#0d1117] border border-slate-200 dark:border-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-teal-300 dark:hover:border-teal-500/40 hover:shadow-md dark:hover:shadow-teal-500/10 h-full"
+                  color={theme === 'dark' ? "#0d1117" : "#f8fafc"}
                 >
                   <div
                     className="w-14 h-14 rounded-xl flex items-center justify-center mb-6"
@@ -564,8 +564,8 @@ export default function LandingPage() {
                   >
                     <feature.icon size={28} className="text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 relative z-20 text-white">{feature.title}</h3>
-                  <p className="text-neutral-300 leading-relaxed relative z-20">{feature.description}</p>
+                  <h3 className="text-xl font-semibold mb-3 relative z-20 text-slate-900 dark:text-white">{feature.title}</h3>
+                  <p className="text-slate-600 dark:text-neutral-300 leading-relaxed relative z-20">{feature.description}</p>
                 </CardSpotlight>
               </AnimatedSection>
             ))}
@@ -577,11 +577,11 @@ export default function LandingPage() {
       <StatsSection />
 
       {/* Testimonials Carousel Section */}
-      <section className="py-24 px-6 bg-[#0a0f1a]">
+      <section className="py-24 px-6 bg-slate-50 dark:bg-[#0a0f1a]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-emerald-400 font-semibold uppercase tracking-wider text-sm">Testimonials</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6">
+            <span className="text-teal-600 dark:text-emerald-400 font-semibold uppercase tracking-wider text-sm">Testimonials</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-slate-900 dark:text-white">
               Loved by Healthcare Professionals
             </h2>
           </div>
@@ -595,7 +595,7 @@ export default function LandingPage() {
           <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-3xl p-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <h2 className="text-white font-bold text-4xl md:text-5xl mb-6">
                 Ready to Transform Your Practice?
               </h2>
               <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
@@ -604,14 +604,14 @@ export default function LandingPage() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-emerald-600 hover:bg-neutral-100 rounded-xl font-semibold text-lg transition-all hover:shadow-xl"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-teal-700 hover:bg-teal-50 rounded-xl font-semibold text-lg transition-all hover:shadow-xl"
                 >
                   Start Free Trial
                   <ArrowRight size={20} />
                 </Link>
                 <a
                   href="#contact"
-                  className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/30 hover:border-white rounded-xl font-semibold text-lg transition-all"
+                  className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/30 hover:bg-white/10 rounded-xl font-semibold text-lg transition-all text-white"
                 >
                   Schedule Demo
                 </a>
@@ -622,7 +622,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-6 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#080c14]">
+      <footer className="py-16 px-6 border-t border-white/5 bg-slate-900 text-slate-400">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-5 gap-12">
             <div className="md:col-span-2">
@@ -634,57 +634,57 @@ export default function LandingPage() {
                   HealthSync
                 </span>
               </Link>
-              <p className="text-neutral-600 dark:text-neutral-400 mb-6 max-w-sm">
+              <p className="text-slate-400 mb-6 max-w-sm">
                 The all-in-one healthcare management platform trusted by 40,000+ professionals worldwide.
               </p>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-6">
                 {[
                   { name: 'Twitter', icon: Twitter },
                   { name: 'LinkedIn', icon: Linkedin },
                   { name: 'Facebook', icon: Facebook },
                 ].map(({ name, icon: Icon }) => (
-                  <a key={name} href="#" className="w-10 h-10 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+                  <a key={name} href="#" className="text-slate-400 hover:text-teal-400 transition-colors">
                     <span className="sr-only">{name}</span>
-                    <Icon size={18} className="text-neutral-600 dark:text-neutral-400" />
+                    <Icon size={22} />
                   </a>
                 ))}
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4 text-neutral-900 dark:text-white">Product</h4>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
               <div className="space-y-3">
                 {['Features', 'Pricing', 'Integrations', 'API'].map((link) => (
-                  <a key={link} href="#" className="block text-neutral-600 dark:text-neutral-400 hover:text-emerald-500 dark:hover:text-white transition-colors">{link}</a>
+                  <a key={link} href="#" className="block text-slate-400 hover:text-white transition-colors">{link}</a>
                 ))}
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4 text-neutral-900 dark:text-white">Company</h4>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
               <div className="space-y-3">
                 {['About', 'Blog', 'Careers', 'Contact'].map((link) => (
-                  <a key={link} href="#" className="block text-neutral-600 dark:text-neutral-400 hover:text-emerald-500 dark:hover:text-white transition-colors">{link}</a>
+                  <a key={link} href="#" className="block text-slate-400 hover:text-white transition-colors">{link}</a>
                 ))}
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4 text-neutral-900 dark:text-white">Support</h4>
+              <h4 className="text-white font-semibold mb-4">Support</h4>
               <div className="space-y-3">
                 {['Help Center', 'Documentation', 'Status', 'Security'].map((link) => (
-                  <a key={link} href="#" className="block text-neutral-600 dark:text-neutral-400 hover:text-emerald-500 dark:hover:text-white transition-colors">{link}</a>
+                  <a key={link} href="#" className="block text-slate-400 hover:text-white transition-colors">{link}</a>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="mt-12 pt-8 border-t border-neutral-200 dark:border-neutral-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-neutral-500 text-sm">© 2024 HealthSync. All rights reserved.</p>
-            <div className="flex items-center gap-6 text-sm text-neutral-500">
-              <a href="#" className="hover:text-emerald-500 dark:hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-emerald-500 dark:hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-emerald-500 dark:hover:text-white transition-colors">Cookie Policy</a>
+          <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-slate-500 text-sm">© 2024 HealthSync. All rights reserved.</p>
+            <div className="flex items-center gap-6 text-sm text-slate-500">
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
             </div>
           </div>
         </div>
