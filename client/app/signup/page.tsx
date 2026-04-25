@@ -10,6 +10,7 @@ import { Loader2, Heart } from 'lucide-react';
 import { NoiseBackground } from '@/components/ui/noise-background';
 
 const SPECIALIZATIONS = [
+  'General Physician',
   'Cardiology',
   'Dermatology',
   'Neurology',
@@ -17,7 +18,18 @@ const SPECIALIZATIONS = [
   'Orthopedics',
   'Ophthalmology',
   'Dentistry',
-  'Psychology'
+  'Psychology',
+  'Psychiatry',
+  'Gynecology',
+  'Urology',
+  'Oncology',
+  'Pulmonology',
+  'Endocrinology',
+  'Gastroenterology',
+  'Nephrology',
+  'Rheumatology',
+  'ENT (Ear, Nose, Throat)',
+  'Internal Medicine',
 ];
 
 export default function SignupPage() {

@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Loader2, HeartPulse, Sparkles, Calendar as CalendarIcon, FileText, CheckCircle2, ChevronRight, UserRound, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getSpecializationsForSymptom, SYMPTOM_SPECIALIZATION_MAP } from '@/constants/symptomMapping';
 
 interface Doctor {
   _id: string;
@@ -16,22 +17,11 @@ interface Doctor {
     name: string;
   };
   specialization: string;
+  experience: number;
   feesPerConsultation: number;
 }
 
-const CONCERN_MAPPING: Record<string, string[]> = {
-  'Fever': ['General', 'Physician', 'Pediatric'],
-  'Headache': ['Neurolog', 'General', 'Physician'],
-  'Cold & Cough': ['General', 'Physician', 'Pediatric'],
-  'Skin Rash': ['Dermatolog', 'Dermatalog', 'Skin'],
-  'Toothache': ['Dentist', 'Dental'],
-  'Blurry Vision': ['Ophthalmolog', 'Eye', 'Vision'],
-  'Chest Pain': ['Cardiolog', 'General', 'Heart'],
-  'Joint Pain': ['Orthopedic', 'Ortho', 'Bone'],
-  'Stress / Anxiety': ['Psycholog', 'Psychiat', 'Therapy']
-};
-
-const SUGGESTIONS = Object.keys(CONCERN_MAPPING);
+const SUGGESTIONS = Object.keys(SYMPTOM_SPECIALIZATION_MAP).filter(key => key !== 'default');
 
 export default function BookAppointmentPage() {
   const router = useRouter();
@@ -52,8 +42,10 @@ export default function BookAppointmentPage() {
     const fetchDoctors = async () => {
       try {
         const response = await api.get('/doctors');
-        const data = response.data.data || response.data;
-        setDoctors(Array.isArray(data) ? data : []);
+        const data = Array.isArray(response.data) 
+          ? response.data 
+          : response.data?.data || response.data?.doctors || [];
+        setDoctors(data);
       } catch (error) {
         console.error("Failed to fetch doctors", error);
         setDoctors([]);
@@ -68,13 +60,17 @@ export default function BookAppointmentPage() {
   const recommendedDoctors = useMemo(() => {
     if (!concern) return [];
     
-    const possibleSpecs = CONCERN_MAPPING[concern] || ['General'];
+    const possibleSpecs = getSpecializationsForSymptom(concern);
     
     const doctorsList = Array.isArray(doctors) ? doctors : [];
     // Find all doctors matching specialization
-    const matches = doctorsList.filter(doc => 
-      possibleSpecs.some(spec => doc.specialization.toLowerCase().includes(spec.toLowerCase()))
-    );
+    const matches = doctorsList.filter(doc => {
+      const doctorSpec = (doc.specialization || '').toLowerCase();
+      return possibleSpecs.some(spec => 
+        doctorSpec.includes(spec.toLowerCase()) || 
+        spec.toLowerCase().includes(doctorSpec)
+      );
+    });
     
     // If no exact matches, fallback to all doctors (or return empty array to show "no specialized doctors")
     // Let's just return the matches (even if empty) so the user sees "No specialized doctors"
@@ -191,7 +187,7 @@ export default function BookAppointmentPage() {
                         : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
                     )}
                   >
-                    {sug}
+                    {sug.charAt(0).toUpperCase() + sug.slice(1)}
                   </button>
                 ))}
               </div>
@@ -241,56 +237,61 @@ export default function BookAppointmentPage() {
             
             <p className="text-sm text-muted-foreground mb-6">Based on <span className="font-semibold text-foreground">"{concern}"</span>, we’ll match you with the best specialist.</p>
             
-            {recommendedDoctors.length > 0 ? (
-              <div className="space-y-4 mb-6">
-                {recommendedDoctors.map(doc => (
-                  <div 
+            {recommendedDoctors.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground border border-dashed rounded-xl">
+                No specialized doctors available right now.
+                <p className="text-sm mt-1">Please pick from available doctors below.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recommendedDoctors.map((doc) => (
+                  <div
                     key={doc._id}
                     onClick={() => setSelectedDoctorId(doc._id)}
-                    className={cn(
-                      "p-6 border-2 rounded-xl flex items-start gap-4 shadow-sm cursor-pointer transition-all",
-                      selectedDoctorId === doc._id 
-                        ? "border-indigo-500 bg-indigo-500/10" 
-                        : "border-border bg-card hover:border-indigo-300"
-                    )}
+                    className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
+                      selectedDoctorId === doc._id
+                        ? 'border-teal-500 bg-teal-500/10'
+                        : 'border-white/10 hover:border-teal-500/50 hover:bg-white/5'
+                    }`}
                   >
-                     <div className="w-14 h-14 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-300 shrink-0">
-                        <UserRound size={28} />
-                     </div>
-                     <div className="flex-1">
-                       <h3 className="text-xl font-bold text-foreground">Dr. {doc.userId.name}</h3>
-                       <p className="text-indigo-600 dark:text-indigo-400 font-medium">{doc.specialization}</p>
-                       <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1"><CheckCircle2 size={14} className="text-green-500"/> Perfect match for exactly what you need.</p>
-                       <p className="text-sm font-semibold mt-2 text-foreground">Fee: ${doc.feesPerConsultation}</p>
-                     </div>
-                     <div className="flex items-center justify-center h-full pt-4">
-                       <div className={cn(
-                         "w-6 h-6 rounded-full border-2 flex items-center justify-center",
-                         selectedDoctorId === doc._id ? "border-indigo-500 bg-indigo-500" : "border-muted-foreground"
-                       )}>
-                          {selectedDoctorId === doc._id && <CheckCircle2 size={16} className="text-white" />}
-                       </div>
-                     </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 font-bold">
+                        {doc.userId?.name?.[0] || 'D'}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-white">
+                          Dr. {doc.userId?.name || 'Unknown'}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {doc.specialization} • {doc.experience} years exp
+                        </p>
+                        <p className="text-sm text-teal-400">
+                          ₹{doc.feesPerConsultation} per consultation
+                        </p>
+                      </div>
+                      {selectedDoctorId === doc._id && (
+                        <div className="ml-auto text-teal-400 text-sm font-medium">✓ Selected</div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
-            ) : (
-               <div className="p-6 border border-border bg-muted/20 rounded-xl text-center mb-6">
-                 No specialized doctors available right now. We will notify you when a slot opens up.
-               </div>
             )}
 
-            <div className="space-y-4">
-              <label className="text-sm font-medium text-foreground">Or pick a different available doctor:</label>
+            {/* All doctors dropdown */}
+            <div className="mt-6">
+              <p className="text-sm text-muted-foreground mb-2">
+                Or pick a different available doctor:
+              </p>
               <select
-                className="flex h-11 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full bg-[#161b22] border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50"
                 value={selectedDoctorId}
                 onChange={(e) => setSelectedDoctorId(e.target.value)}
               >
-                <option value="" disabled>Select a doctor manually</option>
+                <option value="">Select a doctor...</option>
                 {(Array.isArray(doctors) ? doctors : []).map((doctor) => (
                   <option key={doctor._id} value={doctor._id}>
-                    Dr. {doctor.userId.name} - {doctor.specialization} (${doctor.feesPerConsultation})
+                    Dr. {doctor.userId?.name} — {doctor.specialization}
                   </option>
                 ))}
               </select>

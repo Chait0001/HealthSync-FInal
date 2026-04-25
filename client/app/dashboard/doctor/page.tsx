@@ -5,6 +5,7 @@ import api from '@/services/api';
 import { AppointmentCardSkeleton } from '@/components/ui/Skeleton';
 import { Check, X, Calendar, Clock, Activity } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { getDoctorIllustration } from '@/constants/doctorIllustrations';
 
 interface Appointment {
   _id: string;
@@ -21,6 +22,7 @@ interface Appointment {
 export default function DoctorDashboard() {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [doctorProfile, setDoctorProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchAppointments = async () => {
@@ -38,6 +40,15 @@ export default function DoctorDashboard() {
 
   useEffect(() => {
     fetchAppointments();
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get('/doctors/profile');
+        setDoctorProfile(Array.isArray(res.data) ? res.data[0] : res.data?.data || res.data);
+      } catch (err) {
+        console.error('Failed to fetch doctor profile', err);
+      }
+    };
+    fetchProfile();
   }, []);
 
   const handleStatusUpdate = async (id: string, status: string) => {
@@ -62,17 +73,9 @@ export default function DoctorDashboard() {
     <div className="space-y-6">
       {/* Welcoming hero banner with doctor illustration */}
       <div className="relative bg-gradient-to-r from-teal-600/20 to-blue-600/10 border border-teal-500/10 rounded-2xl p-8 mb-8 overflow-hidden shadow-lg shadow-teal-500/5">
-        {/* Animated doctor SVG/illustration on the right */}
-        <div className="absolute right-8 bottom-0 animate-float hidden md:block opacity-90">
-          <svg width="140" height="160" viewBox="0 0 120 140" className="drop-shadow-2xl">
-            {/* Draw a simple pixel/modern doctor: white coat body, head, stethoscope */}
-            <circle cx="60" cy="25" r="20" fill="#f5c5a3"/> {/* head */}
-            <rect x="35" y="45" width="50" height="95" fill="#f8fafc" rx="5"/> {/* coat */}
-            <rect x="50" y="45" width="20" height="30" fill="#e0f2fe"/> {/* shirt */}
-            <path d="M50 45 L60 60 L70 45" fill="#0369a1"/> {/* collar/tie */}
-            <circle cx="60" cy="75" r="8" fill="none" stroke="#00c8a0" strokeWidth="2.5"/> {/* stethoscope chestpiece */}
-            <path d="M52 75 Q40 90 55 105" stroke="#00c8a0" strokeWidth="2.5" fill="none" strokeLinecap="round"/> {/* tube */}
-          </svg>
+        {/* Animated doctor illustration based on specialization */}
+        <div className="absolute right-6 bottom-0 animate-float hidden md:block opacity-90">
+          {getDoctorIllustration(doctorProfile?.specialization || '')}
         </div>
 
         <div className="relative z-10 md:w-2/3">

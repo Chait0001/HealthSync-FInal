@@ -8,11 +8,11 @@ export class DoctorRepository extends BaseRepository<IDoctor> {
   }
 
   async findByUserId(userId: string): Promise<IDoctor | null> {
-    return this.model.findOne({ userId }).exec();
+    return this.model.findOne({ userId }).populate('userId', 'name email phone').exec();
   }
 
   async findAllWithUserInfo(): Promise<IDoctor[]> {
-    return this.model.find({}).populate('userId', 'name email').exec();
+    return this.model.find({}).populate('userId', 'name email phone').exec();
   }
 
   async deleteByUserId(userId: string): Promise<boolean> {
