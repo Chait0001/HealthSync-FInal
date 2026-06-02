@@ -58,4 +58,22 @@ export class AdminController {
       next(err);
     }
   };
+
+  getAllRoles = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const roles = await this.adminService.getAllRoles();
+      res.status(200).json(ApiResponse.success(roles, 'Roles retrieved'));
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getAllPermissions = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const permissions = await this.adminService.getAllPermissions();
+      res.status(200).json(ApiResponse.success(permissions, 'Permissions retrieved'));
+    } catch (err) {
+      next(err);
+    }
+  };
 }

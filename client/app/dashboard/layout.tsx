@@ -12,7 +12,8 @@ import {
   Users,
   LogOut,
   FileText,
-  Stethoscope
+  Stethoscope,
+  ShieldCheck
 } from 'lucide-react';
 
 // Skeleton Loading for the entire dashboard layout
@@ -156,6 +157,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/admin/appointments', label: 'Verify Appointments', icon: Calendar },
     { href: '/dashboard/admin/doctors', label: 'Manage Doctors', icon: Stethoscope },
     { href: '/dashboard/admin/users', label: 'All Users', icon: Users },
+    { href: '/dashboard/admin/roles', label: 'Role Permissions', icon: ShieldCheck },
   ];
 
   let links = patientLinks;

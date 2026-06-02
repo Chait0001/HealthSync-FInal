@@ -5,6 +5,7 @@ import { UserRepository } from '../repositories/UserRepository';
 import { DoctorRepository } from '../repositories/DoctorRepository';
 import { AppointmentRepository } from '../repositories/AppointmentRepository';
 import { RoleRepository } from '../repositories/RoleRepository';
+import { PermissionRepository } from '../repositories/PermissionRepository';
 import { RoleService } from './RoleService';
 import { ApiError } from '../utils/ApiError';
 
@@ -14,12 +15,17 @@ export class AdminService implements IAdminService {
     private readonly doctorRepo: DoctorRepository,
     private readonly appointmentRepo: AppointmentRepository,
     private readonly roleRepo: RoleRepository,
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
+    private readonly permRepo: PermissionRepository
   ) {}
 
 
 async getAllRoles(): Promise<any[]> {
   return this.roleRepo.findAllActive();         
+}
+
+async getAllPermissions(): Promise<any[]> {
+  return this.permRepo.findAllActive();
 }
 
 async assignRoleToUser(userId: string, roleKey: string, adminId: string) {

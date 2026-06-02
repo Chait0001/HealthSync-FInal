@@ -32,6 +32,7 @@ export interface IAdminService {
   getScheduledAppointments(): Promise<IAppointment[]>;
   approveAppointment(id: string): Promise<IAppointment>;
   getAllRoles(): Promise<any[]>;
+  getAllPermissions(): Promise<any[]>;
   assignRoleToUser(userId: string, roleKey: string, adminId: string): Promise<any>;
 }
 

@@ -25,12 +25,14 @@ import { AuthController } from './controllers/AuthController';
 import { DoctorController } from './controllers/DoctorController';
 import { AppointmentController } from './controllers/AppointmentController';
 import { AdminController } from './controllers/AdminController';
+import { RoleController } from './controllers/RoleController';
 
 // Routes
 import { createAuthRouter } from './routes/auth.routes';
 import { createDoctorRouter } from './routes/doctor.routes';
 import { createAppointmentRouter } from './routes/appointment.routes';
 import { createAdminRouter } from './routes/admin.routes';
+import { createRoleRouter } from './routes/role.routes';
 
 // Middleware
 import { errorMiddleware } from './middleware/error.middleware';
@@ -47,12 +49,13 @@ const roleService        = new RoleService(roleRepo, permRepo, rolePermRepo, use
 const authService        = new AuthService(userRepo, doctorRepo);
 const doctorService      = new DoctorService(doctorRepo);
 const appointmentService = new AppointmentService(appointmentRepo, doctorRepo);
-const adminService       = new AdminService(userRepo, doctorRepo, appointmentRepo, roleRepo, roleService);
+const adminService       = new AdminService(userRepo, doctorRepo, appointmentRepo, roleRepo, roleService, permRepo);
 
 const authController        = new AuthController(authService);
 const doctorController      = new DoctorController(doctorService);
 const appointmentController = new AppointmentController(appointmentService);
 const adminController       = new AdminController(adminService);
+const roleController        = new RoleController(roleService);
 
 // ─── Express App ─────────────────────────────────────────────────────────────
 const app = express();
@@ -66,6 +69,7 @@ app.use('/api/auth',         createAuthRouter(authController));
 app.use('/api/doctors',      createDoctorRouter(doctorController));
 app.use('/api/appointments', createAppointmentRouter(appointmentController));
 app.use('/api/admin',        createAdminRouter(adminController));
+app.use('/api/roles',        createRoleRouter(roleController));
 
 app.get('/', (_req, res) => res.json({ message: 'HealthSync API running ✅' }));
 
