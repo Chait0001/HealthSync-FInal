@@ -4,14 +4,27 @@ import { IAppointment } from '../interfaces/IAppointment';
 import { UserRepository } from '../repositories/UserRepository';
 import { DoctorRepository } from '../repositories/DoctorRepository';
 import { AppointmentRepository } from '../repositories/AppointmentRepository';
+import { RoleRepository } from '../repositories/RoleRepository';
+import { RoleService } from './RoleService';
 import { ApiError } from '../utils/ApiError';
 
 export class AdminService implements IAdminService {
   constructor(
     private readonly userRepo: UserRepository,
     private readonly doctorRepo: DoctorRepository,
-    private readonly appointmentRepo: AppointmentRepository
+    private readonly appointmentRepo: AppointmentRepository,
+    private readonly roleRepo: RoleRepository,
+    private readonly roleService: RoleService
   ) {}
+
+
+async getAllRoles(): Promise<any[]> {
+  return this.roleRepo.findAllActive();         
+}
+
+async assignRoleToUser(userId: string, roleKey: string, adminId: string) {
+  return this.roleService.assignRoleToUser(userId, roleKey, adminId);
+}
 
   async getStats(): Promise<{ totalUsers: number; totalDoctors: number; totalPatients: number }> {
     const [totalUsers, totalDoctors, totalPatients] = await Promise.all([

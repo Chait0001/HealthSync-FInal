@@ -9,12 +9,16 @@ import { DatabaseConnection } from './config/database';
 import { UserRepository } from './repositories/UserRepository';
 import { DoctorRepository } from './repositories/DoctorRepository';
 import { AppointmentRepository } from './repositories/AppointmentRepository';
+import { RoleRepository } from './repositories/RoleRepository';
+import { PermissionRepository } from './repositories/PermissionRepository';
+import { RolePermissionRepository } from './repositories/RolePermissionRepository';
 
 // Services
 import { AuthService } from './services/AuthService';
 import { DoctorService } from './services/DoctorService';
 import { AppointmentService } from './services/AppointmentService';
 import { AdminService } from './services/AdminService';
+import { RoleService } from './services/RoleService';
 
 // Controllers
 import { AuthController } from './controllers/AuthController';
@@ -35,11 +39,15 @@ import { errorMiddleware } from './middleware/error.middleware';
 const userRepo        = new UserRepository();
 const doctorRepo      = new DoctorRepository();
 const appointmentRepo = new AppointmentRepository();
+const roleRepo        = new RoleRepository();
+const permRepo        = new PermissionRepository();
+const rolePermRepo    = new RolePermissionRepository();
 
+const roleService        = new RoleService(roleRepo, permRepo, rolePermRepo, userRepo);
 const authService        = new AuthService(userRepo, doctorRepo);
 const doctorService      = new DoctorService(doctorRepo);
 const appointmentService = new AppointmentService(appointmentRepo, doctorRepo);
-const adminService       = new AdminService(userRepo, doctorRepo, appointmentRepo);
+const adminService       = new AdminService(userRepo, doctorRepo, appointmentRepo, roleRepo, roleService);
 
 const authController        = new AuthController(authService);
 const doctorController      = new DoctorController(doctorService);

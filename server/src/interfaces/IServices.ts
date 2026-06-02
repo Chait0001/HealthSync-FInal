@@ -31,6 +31,8 @@ export interface IAdminService {
   getPendingAppointments(): Promise<IAppointment[]>;
   getScheduledAppointments(): Promise<IAppointment[]>;
   approveAppointment(id: string): Promise<IAppointment>;
+  getAllRoles(): Promise<any[]>;
+  assignRoleToUser(userId: string, roleKey: string, adminId: string): Promise<any>;
 }
 
 // Re-export all DTOs for convenience

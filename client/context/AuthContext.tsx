@@ -10,6 +10,7 @@ interface User {
   email: string;
   role: 'patient' | 'doctor' | 'admin';
   token: string;
+  permissions_cache: string[]; 
 }
 
 interface AuthContextType {
@@ -18,7 +19,9 @@ interface AuthContextType {
   register: (userData: any) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  can: (permission: string) => boolean;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -26,6 +29,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const can = (permission: string): boolean => {
+    if (!user) return false;
+    return user.permissions_cache?.includes(permission) ?? false;
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -76,7 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, can }}>
       {children}
     </AuthContext.Provider>
   );

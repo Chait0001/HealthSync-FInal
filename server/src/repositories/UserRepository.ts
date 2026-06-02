@@ -7,13 +7,27 @@ export class UserRepository extends BaseRepository<IUser> {
     super(UserModel);
   }
 
-  /** Domain-specific query — finds user with password field included */
+async assignRole(userId: string, roleData: { role_id: string; role_key: string; role_name: string }) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    { $push: { roles: { ...roleData, is_primary: false, assigned_at: new Date() } } },
+    { new: true }
+  );
+}
+
+async updatePermissionsCache(userId: string, permissions: string[]) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    { $set: { permissions_cache: permissions } },
+    { new: true }
+  );
+}
+
   async findByEmail(email: string, withPassword = false): Promise<IUser | null> {
     const query = this.model.findOne({ email });
     return withPassword ? query.select('+password').exec() : query.exec();
   }
 
-  /** Fetch all users without password, newest first */
   async findAllWithoutPassword(): Promise<IUser[]> {
     return this.model.find({}).select('-password').sort({ createdAt: -1 }).exec();
   }
