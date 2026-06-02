@@ -11,7 +11,16 @@ const userSchema = new Schema<IUser>({
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email'],
   },
   password: { type: String, required: [true, 'Please add a password'], minlength: 6, select: false },
-  role: { type: String, enum: ['patient', 'doctor', 'admin'], default: 'patient' },
+  role: { type: String, enum: ['patient', 'doctor', 'admin'], default: 'patient' }, // keep for backward compat
+  roles: [{
+  role_id: { type: Schema.Types.ObjectId, ref: 'Role' },
+  role_key: { type: String },
+  role_name: { type: String },
+  is_primary:{ type: Boolean, default: false },
+  assigned_at:{ type: Date, default: Date.now },
+}],
+permissions_cache: [{ type: String }], 
+department_id: { type: Schema.Types.ObjectId, ref: 'Department' },
   // Patient fields
   age: { type: Number },
   gender: { type: String, enum: ['Male', 'Female', 'Other'] },
