@@ -6,6 +6,7 @@ import api from '@/services/api';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Skeleton, TableRowSkeleton } from '@/components/ui/Skeleton';
+import { PermissionGate } from '@/components/PermissionGate';
 import { Users, ArrowLeft, Trash2, Mail, Shield, Plus, X, ChevronDown, Loader2, UserPlus, Eye, EyeOff } from 'lucide-react';
 
 interface User {
@@ -281,70 +282,74 @@ export default function AllUsersPage() {
         ))}
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="text-left p-4 text-sm font-medium text-slate-600">User</th>
-              <th className="text-left p-4 text-sm font-medium text-slate-600">Email</th>
-              <th className="text-left p-4 text-sm font-medium text-slate-600">Role</th>
-              <th className="text-left p-4 text-sm font-medium text-slate-600">Joined</th>
-              <th className="text-right p-4 text-sm font-medium text-slate-600">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              // Skeleton loading rows
-              <>
-                <TableRowSkeleton />
-                <TableRowSkeleton />
-                <TableRowSkeleton />
-                <TableRowSkeleton />
-                <TableRowSkeleton />
-              </>
-            ) : filteredUsers.length === 0 ? (
+      <PermissionGate permission="users.view">
+        <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-slate-50">
               <tr>
-                <td colSpan={5} className="p-8 text-center text-slate-500">
-                  <Users className="mx-auto mb-3 opacity-20" size={48} />
-                  <p>No users found</p>
-                </td>
+                <th className="text-left p-4 text-sm font-medium text-slate-600">User</th>
+                <th className="text-left p-4 text-sm font-medium text-slate-600">Email</th>
+                <th className="text-left p-4 text-sm font-medium text-slate-600">Role</th>
+                <th className="text-left p-4 text-sm font-medium text-slate-600">Joined</th>
+                <th className="text-right p-4 text-sm font-medium text-slate-600">Actions</th>
               </tr>
-            ) : (
-              filteredUsers.map((user) => (
-                <tr key={user._id} className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-medium text-sm">
-                        {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                      </div>
-                      <span className="font-medium">{user.name}</span>
-                    </div>
-                  </td>
-                  <td className="p-4 text-slate-600">{user.email}</td>
-                  <td className="p-4">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${getRoleColor(user.role)}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="p-4 text-slate-500 text-sm">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-                  </td>
-                  <td className="p-4 text-right">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleDelete(user._id)}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
+            </thead>
+            <tbody>
+              {loading ? (
+                // Skeleton loading rows
+                <>
+                  <TableRowSkeleton />
+                  <TableRowSkeleton />
+                  <TableRowSkeleton />
+                  <TableRowSkeleton />
+                  <TableRowSkeleton />
+                </>
+              ) : filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-slate-500">
+                    <Users className="mx-auto mb-3 opacity-20" size={48} />
+                    <p>No users found</p>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                filteredUsers.map((user) => (
+                  <tr key={user._id} className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-medium text-sm">
+                          {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                        </div>
+                        <span className="font-medium">{user.name}</span>
+                      </div>
+                    </td>
+                    <td className="p-4 text-slate-600">{user.email}</td>
+                    <td className="p-4">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${getRoleColor(user.role)}`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="p-4 text-slate-500 text-sm">
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td className="p-4 text-right">
+                      <PermissionGate permission="users.delete">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDelete(user._id)}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </PermissionGate>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </PermissionGate>
     </div>
   );
 }

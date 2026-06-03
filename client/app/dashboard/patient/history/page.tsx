@@ -5,16 +5,18 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { FileText, ArrowLeft, Heart, Activity, Pill } from 'lucide-react';
+import { PermissionGate } from '@/components/PermissionGate';
 
 export default function MedicalHistoryPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard/patient">
-          <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
-        </Link>
-        <h1 className="text-3xl font-bold text-white">Medical History</h1>
-      </div>
+    <PermissionGate permission="patients.view">
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard/patient">
+            <Button variant="ghost" size="sm"><ArrowLeft size={16} /></Button>
+          </Link>
+          <h1 className="text-3xl font-bold text-white">Medical History</h1>
+        </div>
 
       <div className="grid md:grid-cols-3 gap-6">
         <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
@@ -83,6 +85,7 @@ export default function MedicalHistoryPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </PermissionGate>
   );
 }

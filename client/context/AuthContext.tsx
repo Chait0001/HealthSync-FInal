@@ -9,6 +9,7 @@ interface User {
   name: string;
   email: string;
   role: 'patient' | 'doctor' | 'admin';
+  roleId?: string;
   token: string;
   permissions_cache: string[]; 
 }

@@ -6,6 +6,7 @@ import { RoleService } from './RoleService';
 import { ApiError } from '../utils/ApiError';
 import { signToken, verifyToken } from '../utils/jwt.utils';
 import { JwtPayload } from 'jsonwebtoken';
+import { RoleModel } from '../models/Role.model';
 
 /**
  * AuthService — SRP: handles only authentication logic.
@@ -53,11 +54,20 @@ export class AuthService implements IAuthService {
       } as any);
     }
 
+    let roleId = '';
+    if (user.roles && user.roles.length > 0) {
+      roleId = user.roles[0].role_id.toString();
+    } else {
+      const roleDoc = await RoleModel.findOne({ key: user.role });
+      if (roleDoc) roleId = roleDoc._id.toString();
+    }
+
     return {
       _id: user._id.toString(),
       name: user.name,
       email: user.email,
       role: user.role,
+      roleId,
       token: signToken(user._id.toString()),
       permissions_cache: permissions ?? [],
     };
@@ -76,11 +86,20 @@ export class AuthService implements IAuthService {
       throw new ApiError('Invalid email or password', 401);
     }
 
+    let roleId = '';
+    if (user.roles && user.roles.length > 0) {
+      roleId = user.roles[0].role_id.toString();
+    } else {
+      const roleDoc = await RoleModel.findOne({ key: user.role });
+      if (roleDoc) roleId = roleDoc._id.toString();
+    }
+
     return {
       _id: user._id.toString(),
       name: user.name,
       email: user.email,
       role: user.role,
+      roleId,
       token: signToken(user._id.toString()),
       permissions_cache: (user as any).permissions_cache ?? [],
     };

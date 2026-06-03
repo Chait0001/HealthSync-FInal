@@ -56,6 +56,7 @@ export interface AuthResponse {
   name: string;
   email: string;
   role: string;
+  roleId?: string;
   token: string;
   permissions_cache: string[];
 }

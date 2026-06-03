@@ -15,6 +15,8 @@ import {
   Stethoscope,
   ShieldCheck
 } from 'lucide-react';
+import { PermissionsProvider } from '@/context/PermissionsContext';
+import { usePermission } from '@/hooks/usePermission';
 
 // Skeleton Loading for the entire dashboard layout
 function DashboardSkeleton() {
@@ -107,62 +109,34 @@ function DashboardSkeleton() {
   );
 }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout, loading } = useAuth();
-  const router = useRouter();
+function DashboardInner({ children }: { children: React.ReactNode }) {
+  const { user, logout } = useAuth();
   const pathname = usePathname();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-      return;
-    }
-
-    // Role-based route protection
-    if (!loading && user) {
-      const isAdminRoute = pathname.startsWith('/dashboard/admin');
-      const isDoctorRoute = pathname.startsWith('/dashboard/doctor');
-      const isPatientRoute = pathname.startsWith('/dashboard/patient');
-
-      // Redirect to correct dashboard based on role
-      if (isAdminRoute && user.role !== 'admin') {
-        router.replace(`/dashboard/${user.role}`);
-      } else if (isDoctorRoute && user.role !== 'doctor') {
-        router.replace(`/dashboard/${user.role}`);
-      } else if (isPatientRoute && user.role !== 'patient') {
-        router.replace(`/dashboard/${user.role}`);
-      }
-    }
-  }, [user, loading, router, pathname]);
-
-  // Show skeleton loading instead of plain text
-  if (loading) return <DashboardSkeleton />;
-  if (!user) return <DashboardSkeleton />;
-
   const patientLinks = [
     { href: '/dashboard/patient', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/patient/appointments', label: 'My Appointments', icon: Calendar },
-    { href: '/dashboard/patient/history', label: 'Medical History', icon: FileText },
+    { href: '/dashboard/patient/appointments', label: 'My Appointments', icon: Calendar, permission: 'appointments.view' },
+    { href: '/dashboard/patient/history', label: 'Medical History', icon: FileText, permission: 'patients.view' },
   ];
 
   const doctorLinks = [
     { href: '/dashboard/doctor', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/doctor/appointments', label: 'Appointments', icon: Calendar },
-    { href: '/dashboard/doctor/patients', label: 'My Patients', icon: Users },
+    { href: '/dashboard/doctor/appointments', label: 'Appointments', icon: Calendar, permission: 'appointments.view' },
+    { href: '/dashboard/doctor/patients', label: 'My Patients', icon: Users, permission: 'patients.view' },
   ];
 
   const adminLinks = [
     { href: '/dashboard/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/admin/appointments', label: 'Verify Appointments', icon: Calendar },
-    { href: '/dashboard/admin/doctors', label: 'Manage Doctors', icon: Stethoscope },
-    { href: '/dashboard/admin/users', label: 'All Users', icon: Users },
-    { href: '/dashboard/admin/roles', label: 'Role Permissions', icon: ShieldCheck },
+    { href: '/dashboard/admin/appointments', label: 'Verify Appointments', icon: Calendar, permission: 'appointments.approve' },
+    { href: '/dashboard/admin/doctors', label: 'Manage Doctors', icon: Stethoscope, permission: 'doctors.manage' },
+    { href: '/dashboard/admin/users', label: 'All Users', icon: Users, permission: 'users.view' },
+    { href: '/dashboard/admin/roles', label: 'Role Permissions', icon: ShieldCheck, permission: 'roles.manage' },
   ];
 
   let links = patientLinks;
-  if (user.role === 'doctor') links = doctorLinks;
-  if (user.role === 'admin') links = adminLinks;
+  if (user?.role === 'doctor') links = doctorLinks;
+  if (user?.role === 'admin') links = adminLinks;
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-[#0f1117] text-slate-900 dark:text-white">
@@ -183,6 +157,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav className="flex-1 p-4 space-y-2 mt-2">
           {links.map((link) => {
             const isActive = pathname === link.href;
+            if (link.permission) {
+              const hasPerm = usePermission(link.permission);
+              if (!hasPerm) return null;
+            }
             return (
               <Link
                 key={link.href}
@@ -227,5 +205,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </main>
     </div>
+  );
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+      return;
+    }
+
+    // Role-based route protection
+    if (!loading && user) {
+      const isAdminRoute = pathname.startsWith('/dashboard/admin');
+      const isDoctorRoute = pathname.startsWith('/dashboard/doctor');
+      const isPatientRoute = pathname.startsWith('/dashboard/patient');
+
+      // Redirect to correct dashboard based on role
+      if (isAdminRoute && user.role !== 'admin') {
+        router.replace(`/dashboard/${user.role}`);
+      } else if (isDoctorRoute && user.role !== 'doctor') {
+        router.replace(`/dashboard/${user.role}`);
+      } else if (isPatientRoute && user.role !== 'patient') {
+        router.replace(`/dashboard/${user.role}`);
+      }
+    }
+  }, [user, loading, router, pathname]);
+
+  // Show skeleton loading instead of plain text
+  if (loading) return <DashboardSkeleton />;
+  if (!user) return <DashboardSkeleton />;
+
+  return (
+    <PermissionsProvider>
+      <DashboardInner>{children}</DashboardInner>
+    </PermissionsProvider>
   );
 }

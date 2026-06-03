@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 
 // Config
 import { DatabaseConnection } from './config/database';
@@ -59,6 +61,22 @@ const roleController        = new RoleController(roleService);
 
 // ─── Express App ─────────────────────────────────────────────────────────────
 const app = express();
+const httpServer = createServer(app);
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  }
+});
+
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log(`🔌 Client connected: ${socket.id}`);
+  socket.on('disconnect', () => {
+    console.log(`🔌 Client disconnected: ${socket.id}`);
+  });
+});
 
 app.use(cors());
 app.use(express.json());
@@ -81,7 +99,7 @@ const PORT = Number(process.env.PORT) || 8080;
 
 const start = async (): Promise<void> => {
   await DatabaseConnection.getInstance().connect();
-  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  httpServer.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 };
 
 start();

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { RoleService } from '../services/RoleService';
 import { ApiResponse } from '../utils/ApiResponse';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { RolePermissionModel } from '../models/RolePermission';
 
 export class RoleController {
   constructor(private roleService: RoleService) {}
@@ -15,20 +16,63 @@ export class RoleController {
 
   getRoleWithPermissions = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data = await this.roleService.getRoleWithPermissions(String(req.params.id));
-      res.json(ApiResponse.success(data, 'Role permissions retrieved'));
+      const roleId = String(req.params.id);
+      const role = await (this.roleService as any).roleRepo.findById(roleId);
+      if (!role) {
+        res.status(404).json(ApiResponse.error('Role not found', 404));
+        return;
+      }
+      // Migrate legacy permissions if Map is empty
+      if (!role.permissions || role.permissions.size === 0) {
+        const rolePermissions = await RolePermissionModel.find({ role_id: roleId, effect: 'allow' });
+        role.permissions = new Map();
+        for (const rp of rolePermissions) {
+          role.permissions.set(rp.permission_key, true);
+        }
+        await role.save();
+      }
+      const permissionsMap = Object.fromEntries(role.permissions);
+      res.json(ApiResponse.success(permissionsMap, 'Role permissions map retrieved'));
     } catch (err) { next(err); }
   };
 
   setPermissionsForRole = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const { permission_keys } = req.body; // string[]
-      const data = await this.roleService.setPermissionsForRole(
-        String(req.params.id),
-        permission_keys,
-        req.user!._id.toString()
-      );
-      res.json(ApiResponse.success(data, 'Permissions updated'));
+      const roleId = String(req.params.id);
+      const { permissionKey, value } = req.body;
+      if (!permissionKey) {
+        res.status(400).json(ApiResponse.error('permissionKey is required', 400));
+        return;
+      }
+
+      const role = await (this.roleService as any).roleRepo.findById(roleId);
+      if (!role) {
+        res.status(404).json(ApiResponse.error('Role not found', 404));
+        return;
+      }
+
+      if (!role.permissions) {
+        role.permissions = new Map();
+      }
+
+      role.permissions.set(permissionKey, value);
+      await role.save();
+
+      // Emit socket event
+      req.app.get('io')?.emit('permissions:updated', { roleId });
+
+      // Refresh cache for all users with this role
+      const users = await (this.roleService as any).userRepo.model.find({ role: role.key });
+      for (const u of users) {
+        const activePerms: string[] = [];
+        for (const [k, v] of role.permissions.entries()) {
+          if (v === true) activePerms.push(k);
+        }
+        await (this.roleService as any).userRepo.updatePermissionsCache(u._id.toString(), activePerms);
+      }
+
+      const permissionsMap = Object.fromEntries(role.permissions);
+      res.json(ApiResponse.success(permissionsMap, 'Permission updated successfully'));
     } catch (err) { next(err); }
   };
 

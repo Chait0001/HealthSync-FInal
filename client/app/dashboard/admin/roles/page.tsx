@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState, Fragment, useRef } from 'react';
 import api from '@/services/api';
 import { Button } from '@/components/ui/Button';
+import { PermissionGate } from '@/components/PermissionGate';
 import {
   Shield,
   Save,
@@ -315,8 +316,38 @@ export default function RolesPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [showAddPerm, setShowAddPerm] = useState(false);
-  const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
   const [deletingRoleId, setDeletingRoleId] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const timeouts = useRef<Record<string, NodeJS.Timeout>>({});
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+  };
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const debouncedUpdate = (roleId: string, permissionKey: string, value: boolean) => {
+    const key = `${roleId}-${permissionKey}`;
+    if (timeouts.current[key]) {
+      clearTimeout(timeouts.current[key]);
+    }
+    timeouts.current[key] = setTimeout(async () => {
+      try {
+        await api.put(`/roles/${roleId}/permissions`, {
+          permissionKey,
+          value,
+        });
+        showToast("Permission updated — changes reflect immediately on user dashboards");
+      } catch (err) {
+        console.error('Failed to update permission', err);
+      }
+    }, 500);
+  };
 
 
   const fetchData = async () => {
@@ -337,10 +368,9 @@ export default function RolesPage() {
         fetchedRoles.map(async (role: any) => {
           try {
             const rolePermsRes = await api.get(`/roles/${role._id}/permissions`);
-            const permDocs = rolePermsRes.data.data.permissions || [];
-            initialSelected[role._id] = new Set(
-              permDocs.map((pd: any) => pd.permission_key)
-            );
+            const permMap = rolePermsRes.data.data || {};
+            const trueKeys = Object.keys(permMap).filter(k => permMap[k] === true);
+            initialSelected[role._id] = new Set(trueKeys);
           } catch (err) {
             console.error(`Failed to fetch permissions for role ${role.name}`, err);
           }
@@ -359,30 +389,19 @@ export default function RolesPage() {
   }, []);
 
   const toggle = (roleId: string, permKey: string) => {
+    let nextValue = false;
     setSelected((prev) => {
       const set = new Set(prev[roleId] ?? []);
       if (set.has(permKey)) {
         set.delete(permKey);
+        nextValue = false;
       } else {
         set.add(permKey);
+        nextValue = true;
       }
       return { ...prev, [roleId]: set };
     });
-  };
-
-  const save = async (roleId: string) => {
-    setSavingRoleId(roleId);
-    try {
-      await api.put(`/roles/${roleId}/permissions`, {
-        permission_keys: [...(selected[roleId] ?? [])],
-      });
-      alert('Permissions saved successfully!');
-    } catch (err) {
-      console.error('Failed to save permissions', err);
-      alert('Failed to save permissions. Please try again.');
-    } finally {
-      setSavingRoleId(null);
-    }
+    debouncedUpdate(roleId, permKey, nextValue);
   };
 
   const handleDelete = async (roleId: string, roleName: string) => {
@@ -415,7 +434,8 @@ export default function RolesPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <PermissionGate permission="roles.manage">
+      <div className="max-w-6xl mx-auto space-y-6">
       {showAddPerm && (
         <AddPermissionModal
           onClose={() => setShowAddPerm(false)}
@@ -581,33 +601,25 @@ export default function RolesPage() {
         </div>
       </div>
 
-      {/* Save Bar */}
+      {/* Auto-save Status Banner */}
       <div className="flex flex-wrap gap-4 p-4 bg-slate-50 dark:bg-[#0d1117]/60 border border-slate-200 dark:border-white/5 rounded-2xl items-center justify-between">
         <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
           <Shield className="w-5 h-5 text-teal-500" />
           <span>
-            Select permissions check-boxes and click save to apply RBAC updates.
+            Permissions checkboxes update in real-time. Changes will reflect instantly on all active user dashboards.
           </span>
-        </div>
-        <div className="flex gap-3 flex-wrap">
-          {roles.map((r) => (
-            <Button
-              key={r._id}
-              onClick={() => save(r._id)}
-              disabled={savingRoleId !== null}
-              className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all flex items-center gap-1.5"
-            >
-              {savingRoleId === r._id ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Save className="w-4 h-4" />
-              )}
-              <span>Save {r.name}</span>
-            </Button>
-          ))}
         </div>
       </div>
 
-    </div>
+      {/* Floating Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 bg-teal-600 text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300">
+          <ShieldCheck size={16} />
+          <span className="text-sm font-medium">{toast}</span>
+        </div>
+      )}
+
+      </div>
+    </PermissionGate>
   );
 }

@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { Users, ArrowLeft } from 'lucide-react';
+import { PermissionGate } from '@/components/PermissionGate';
 
 interface PatientFromAppointment {
   _id: string;
@@ -54,42 +55,44 @@ export default function MyPatientsPage() {
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">My Patients</h1>
       </div>
 
-      {loading ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      ) : (Array.isArray(patients) ? patients : []).length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12 text-slate-500">
-            <Users className="mx-auto mb-3 opacity-20" size={48} />
-            <p>No patients yet</p>
-            <p className="text-sm mt-2">Patients will appear here after they book appointments with you</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(Array.isArray(patients) ? patients : []).map((patient) => (
-            <Card key={patient._id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
-                    {patient.name.charAt(0).toUpperCase()}
+      <PermissionGate permission="patients.view">
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
+        ) : (Array.isArray(patients) ? patients : []).length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-12 text-slate-500">
+              <Users className="mx-auto mb-3 opacity-20" size={48} />
+              <p>No patients yet</p>
+              <p className="text-sm mt-2">Patients will appear here after they book appointments with you</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(Array.isArray(patients) ? patients : []).map((patient) => (
+              <Card key={patient._id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                      {patient.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900 dark:text-white">{patient.name}</p>
+                      <p className="text-sm text-slate-500">{patient.email}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-slate-900 dark:text-white">{patient.name}</p>
-                    <p className="text-sm text-slate-500">{patient.email}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </PermissionGate>
     </div>
   );
 }
