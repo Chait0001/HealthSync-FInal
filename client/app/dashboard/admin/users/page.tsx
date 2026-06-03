@@ -6,7 +6,7 @@ import api from '@/services/api';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Skeleton, TableRowSkeleton } from '@/components/ui/Skeleton';
-import { Users, ArrowLeft, Trash2, Mail, Shield, Plus, X, ChevronDown, Loader2, UserPlus } from 'lucide-react';
+import { Users, ArrowLeft, Trash2, Mail, Shield, Plus, X, ChevronDown, Loader2, UserPlus, Eye, EyeOff } from 'lucide-react';
 
 interface User {
   _id: string;
@@ -17,6 +17,29 @@ interface User {
 }
 
 const inputCls2 = "w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition";
+
+const SPECIALIZATIONS = [
+  'General Physician',
+  'Cardiology',
+  'Dermatology',
+  'Neurology',
+  'Pediatrics',
+  'Orthopedics',
+  'Ophthalmology',
+  'Dentistry',
+  'Psychology',
+  'Psychiatry',
+  'Gynecology',
+  'Urology',
+  'Oncology',
+  'Pulmonology',
+  'Endocrinology',
+  'Gastroenterology',
+  'Nephrology',
+  'Rheumatology',
+  'ENT (Ear, Nose, Throat)',
+  'Internal Medicine',
+];
 
 function Field2({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
@@ -37,6 +60,7 @@ function AddUserModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
 
@@ -92,7 +116,16 @@ function AddUserModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
             <input className={inputCls2} type="email" placeholder="user@hospital.com" value={form.email} onChange={e => set('email', e.target.value)} />
           </Field2>
           <Field2 label="Password" required>
-            <input className={inputCls2} type="password" placeholder="Min. 6 characters" value={form.password} onChange={e => set('password', e.target.value)} />
+            <div className="relative">
+              <input className={inputCls2 + ' pr-10'} type={showPassword ? 'text' : 'password'} placeholder="Min. 6 characters" value={form.password} onChange={e => set('password', e.target.value)} />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </Field2>
           <div className="grid grid-cols-2 gap-3">
             <Field2 label="Phone">
@@ -114,7 +147,21 @@ function AddUserModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
               <p className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wider">Doctor details</p>
               <div className="grid grid-cols-2 gap-3">
                 <Field2 label="Specialization">
-                  <input className={inputCls2} placeholder="e.g. Cardiology" value={form.specialization} onChange={e => set('specialization', e.target.value)} />
+                  <div className="relative">
+                    <select
+                      className={inputCls2 + ' appearance-none pr-8'}
+                      value={form.specialization}
+                      onChange={e => set('specialization', e.target.value)}
+                    >
+                      <option value="" disabled>Select Specialization</option>
+                      {SPECIALIZATIONS.map((spec) => (
+                        <option key={spec} value={spec}>
+                          {spec}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
                 </Field2>
                 <Field2 label="Department">
                   <input className={inputCls2} placeholder="e.g. ICU" value={form.department} onChange={e => set('department', e.target.value)} />

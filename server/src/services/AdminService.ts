@@ -42,8 +42,11 @@ async getAllPermissions(): Promise<any[]> {
     if (!name || !email || !password || !role) throw new ApiError('name, email, password and role are required', 400);
     const exists = await this.userRepo.findByEmail(email);
     if (exists) throw new ApiError('A user with this email already exists', 409);
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await this.userRepo.create({ name, email, password: hashed, role, ...extra } as any);
+    
+    const user = await this.userRepo.create({ name, email, password, role, ...extra } as any);
+    
+    await this.roleService.assignRoleToUser(user._id.toString(), role, 'system');
+
     if (role === 'doctor') {
       await this.doctorRepo.create({
         userId: user._id,
@@ -53,7 +56,9 @@ async getAllPermissions(): Promise<any[]> {
         department: extra.department,
       } as any);
     }
-    return user;
+    
+    const updatedUser = await this.userRepo.findById(user._id.toString());
+    return updatedUser || user;
   }
 
   async getStats(): Promise<{ totalUsers: number; totalDoctors: number; totalPatients: number }> {

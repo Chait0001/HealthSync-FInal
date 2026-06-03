@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { IAuthService, RegisterDTO, LoginDTO, AuthResponse } from '../interfaces/IServices';
 import { UserRepository } from '../repositories/UserRepository';
 import { DoctorRepository } from '../repositories/DoctorRepository';
+import { RoleService } from './RoleService';
 import { ApiError } from '../utils/ApiError';
 import { signToken, verifyToken } from '../utils/jwt.utils';
 import { JwtPayload } from 'jsonwebtoken';
@@ -13,7 +14,8 @@ import { JwtPayload } from 'jsonwebtoken';
 export class AuthService implements IAuthService {
   constructor(
     private readonly userRepo: UserRepository,
-    private readonly doctorRepo: DoctorRepository
+    private readonly doctorRepo: DoctorRepository,
+    private readonly roleService: RoleService
   ) {}
 
   async register(data: RegisterDTO): Promise<AuthResponse> {
@@ -36,6 +38,9 @@ export class AuthService implements IAuthService {
       ...otherDetails,
     } as any);
 
+    // Assign role and refresh permissions cache
+    const permissions = await this.roleService.assignRoleToUser(user._id.toString(), role, 'system');
+
     // If doctor, create doctor profile
     if (role === 'doctor') {
       await this.doctorRepo.create({
@@ -54,7 +59,7 @@ export class AuthService implements IAuthService {
       email: user.email,
       role: user.role,
       token: signToken(user._id.toString()),
-      permissions_cache: (user as any).permissions_cache ?? [],
+      permissions_cache: permissions ?? [],
     };
   }
 

@@ -46,7 +46,7 @@ const permRepo        = new PermissionRepository();
 const rolePermRepo    = new RolePermissionRepository();
 
 const roleService        = new RoleService(roleRepo, permRepo, rolePermRepo, userRepo);
-const authService        = new AuthService(userRepo, doctorRepo);
+const authService        = new AuthService(userRepo, doctorRepo, roleService);
 const doctorService      = new DoctorService(doctorRepo);
 const appointmentService = new AppointmentService(appointmentRepo, doctorRepo);
 const adminService       = new AdminService(userRepo, doctorRepo, appointmentRepo, roleRepo, roleService, permRepo);
