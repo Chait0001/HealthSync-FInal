@@ -14,6 +14,13 @@ export class AdminController {
     }
   };
 
+  createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user = await this.adminService.createUser(req.body);
+      res.status(201).json(ApiResponse.success(user, 'User created successfully'));
+    } catch (err) { next(err); }
+  };
+
   getAllUsers = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const users = await this.adminService.getAllUsers();

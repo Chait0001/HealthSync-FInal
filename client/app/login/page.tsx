@@ -41,10 +41,10 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center">
             <Heart size={24} className="text-white" />
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold text-slate-900 dark:text-white">
             HealthSync
           </span>
         </div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
               </div>
 
               <Button
-                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-medium py-2.5"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium py-2.5"
                 type="submit"
                 disabled={isLoading}
               >

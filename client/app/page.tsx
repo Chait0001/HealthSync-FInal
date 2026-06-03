@@ -208,7 +208,7 @@ function HeroDashboardStats() {
   }, []);
 
   const stats = [
-    { label: 'Patients Today', value: patients, prefix: '', color: 'bg-teal-50 dark:bg-emerald-500/20 text-teal-700 dark:text-emerald-400' },
+    { label: 'Patients Today', value: patients, prefix: '', color: 'bg-teal-50 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400' },
     { label: 'Pending', value: pending, prefix: '', color: 'bg-amber-50 dark:bg-yellow-500/20 text-amber-700 dark:text-yellow-400' },
     { label: 'Revenue', value: revenue, prefix: '$', color: 'bg-blue-50 dark:bg-cyan-500/20 text-blue-700 dark:text-cyan-400' },
   ];

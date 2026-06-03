@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { IAdminService } from '../interfaces/IServices';
 import { IUser } from '../interfaces/IUser';
 import { IAppointment } from '../interfaces/IAppointment';
@@ -28,9 +29,32 @@ async getAllPermissions(): Promise<any[]> {
   return this.permRepo.findAllActive();
 }
 
-async assignRoleToUser(userId: string, roleKey: string, adminId: string) {
-  return this.roleService.assignRoleToUser(userId, roleKey, adminId);
-}
+  async assignRoleToUser(userId: string, roleKey: string, adminId: string) {
+    return this.roleService.assignRoleToUser(userId, roleKey, adminId);
+  }
+
+  async createUser(data: {
+    name: string; email: string; password: string; role: string;
+    phone?: string; gender?: string; specialization?: string;
+    experience?: string; feesPerConsultation?: string; department?: string;
+  }): Promise<IUser> {
+    const { name, email, password, role, ...extra } = data;
+    if (!name || !email || !password || !role) throw new ApiError('name, email, password and role are required', 400);
+    const exists = await this.userRepo.findByEmail(email);
+    if (exists) throw new ApiError('A user with this email already exists', 409);
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await this.userRepo.create({ name, email, password: hashed, role, ...extra } as any);
+    if (role === 'doctor') {
+      await this.doctorRepo.create({
+        userId: user._id,
+        specialization: extra.specialization,
+        experience: extra.experience,
+        feesPerConsultation: extra.feesPerConsultation,
+        department: extra.department,
+      } as any);
+    }
+    return user;
+  }
 
   async getStats(): Promise<{ totalUsers: number; totalDoctors: number; totalPatients: number }> {
     const [totalUsers, totalDoctors, totalPatients] = await Promise.all([

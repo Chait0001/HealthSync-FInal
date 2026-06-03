@@ -115,7 +115,7 @@ export default function DoctorDashboard() {
           </div>
         ) : appointmentsList.length === 0 ? (
           <div className="text-center py-20 px-6">
-            <div className="flex justify-center mb-6 opacity-80 animate-float">
+            <div className="flex justify-center mb-6 opacity-40">
               {/* Empty state animated SVG */}
               <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-teal-500/50">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -149,13 +149,13 @@ export default function DoctorDashboard() {
                         </div>
                         <div>
                           <p className="font-medium text-slate-900 dark:text-white">{apt.patientId?.name || 'Unknown Patient'}</p>
-                          <p className="text-xs text-slate-500 dark:text-neutral-500 mt-0.5">{apt.patientId?.email || 'No email provided'}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{apt.patientId?.email || 'No email provided'}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-slate-900 dark:text-white font-medium">{new Date(apt.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-                      <p className="text-xs text-slate-500 dark:text-neutral-500 mt-0.5 flex items-center gap-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1">
                         <Clock size={12} />
                         {new Date(apt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>

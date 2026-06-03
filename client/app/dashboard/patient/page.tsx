@@ -56,7 +56,7 @@ export default function PatientDashboard() {
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Wednesday, {new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}</p>
         </div>
         <Link href="/dashboard/patient/book">
-          <Button className="gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 border-none shadow-lg shadow-blue-500/20">
+          <Button className="gap-2 bg-teal-600 hover:bg-teal-700 border-none">
             <Plus size={16} /> Book Appointment
           </Button>
         </Link>
@@ -96,7 +96,7 @@ export default function PatientDashboard() {
           </div>
         ) : appointmentsList.length === 0 ? (
           <div className="text-center py-16 px-6">
-            <div className="flex justify-center mb-6 opacity-80 animate-float">
+            <div className="flex justify-center mb-6 opacity-40">
               {/* Empty state SVG */}
               <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-blue-500/50">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -140,13 +140,13 @@ export default function PatientDashboard() {
                         </div>
                         <div>
                           <p className="font-medium text-slate-900 dark:text-white">Dr. {apt.doctorId?.userId?.name || 'Unknown'}</p>
-                          <p className="text-xs text-slate-500 dark:text-neutral-500 mt-0.5">{apt.doctorId?.specialization || 'General'}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{apt.doctorId?.specialization || 'General'}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-slate-900 dark:text-white font-medium">{new Date(apt.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-                      <p className="text-xs text-slate-500 dark:text-neutral-500 mt-0.5 flex items-center gap-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1">
                         <Clock size={12} />
                         {new Date(apt.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>

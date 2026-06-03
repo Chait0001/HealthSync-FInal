@@ -34,6 +34,7 @@ export interface IAdminService {
   getAllRoles(): Promise<any[]>;
   getAllPermissions(): Promise<any[]>;
   assignRoleToUser(userId: string, roleKey: string, adminId: string): Promise<any>;
+  createUser(data: any): Promise<any>;
 }
 
 // Re-export all DTOs for convenience

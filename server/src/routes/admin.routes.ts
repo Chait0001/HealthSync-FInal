@@ -11,6 +11,7 @@ export const createAdminRouter = (adminController: AdminController): Router => {
 
   router.get('/stats', adminController.getStats);
   router.get('/users', adminController.getAllUsers);
+  router.post('/users', adminController.createUser);
   router.delete('/users/:id', adminController.deleteUser);
   router.get('/appointments/pending', adminController.getPendingAppointments);
   router.get('/appointments/scheduled', adminController.getScheduledAppointments);
