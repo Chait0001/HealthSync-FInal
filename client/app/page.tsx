@@ -98,7 +98,7 @@ function DropdownMenu({
     <div className="relative">
       <button
         onClick={onToggle}
-        className="flex items-center gap-1 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 cursor-pointer"
+        className="flex items-center gap-1 text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 cursor-pointer"
       >
         {label}
         <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -151,14 +151,14 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
                 <Star key={j} size={18} className="fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <p className="text-slate-700 dark:text-neutral-200 text-xl leading-relaxed mb-8 italic">"{t.content}"</p>
+            <p className="text-slate-700 dark:text-slate-200 text-xl leading-relaxed mb-8 italic">"{t.content}"</p>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-teal-600 dark:bg-gradient-to-br dark:from-emerald-500 dark:to-cyan-500 flex items-center justify-center font-bold text-sm text-white">
+              <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center font-bold text-sm text-white">
                 {t.initials}
               </div>
               <div>
                 <div className="font-semibold text-slate-900 dark:text-white">{t.name}</div>
-                <div className="text-sm text-slate-500 dark:text-neutral-400">{t.role}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">{t.role}</div>
               </div>
             </div>
           </motion.div>
@@ -169,7 +169,7 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
       <div className="flex items-center justify-between mt-6">
         <button
           onClick={() => go((current - 1 + testimonials.length) % testimonials.length)}
-          className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 hover:border-teal-300 dark:hover:border-emerald-500/50 flex items-center justify-center text-slate-600 dark:text-neutral-400 hover:bg-teal-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white transition-all"
+          className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 hover:border-teal-300 dark:hover:border-teal-500/50 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white transition-all"
         >
           &#8592;
         </button>
@@ -184,7 +184,7 @@ function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] })
         </div>
         <button
           onClick={() => go((current + 1) % testimonials.length)}
-          className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 hover:border-teal-300 dark:hover:border-emerald-500/50 flex items-center justify-center text-slate-600 dark:text-neutral-400 hover:bg-teal-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white transition-all"
+          className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10 hover:border-teal-300 dark:hover:border-teal-500/50 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-teal-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white transition-all"
         >
           &#8594;
         </button>
@@ -253,12 +253,12 @@ function StatsSection() {
         <div ref={ref} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, i) => (
             <AnimatedSection key={i} delay={i * 0.1} direction="up">
-              <div className="bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-white/5 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-teal-300 dark:hover:border-emerald-500/30 hover:shadow-md dark:hover:shadow-emerald-500/10 transition-all duration-300">
-                <div className="text-4xl lg:text-5xl font-bold text-teal-600 dark:text-transparent dark:bg-gradient-to-r dark:from-emerald-400 dark:to-cyan-400 dark:bg-clip-text mb-2">
+              <div className="bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-white/5 rounded-2xl p-8 text-center hover:-translate-y-1 hover:border-teal-300 dark:hover:border-teal-500/30 hover:shadow-md transition-all duration-300">
+                <div className="text-4xl lg:text-5xl font-bold text-teal-600 dark:text-teal-400 mb-2">
                   {stat.value.toLocaleString()}{stat.suffix}
                 </div>
                 <div className="text-slate-700 dark:text-white font-semibold mb-1">{stat.label}</div>
-                <div className="text-slate-500 dark:text-neutral-500 text-sm">{stat.sublabel}</div>
+                <div className="text-slate-500 dark:text-slate-400 text-sm">{stat.sublabel}</div>
               </div>
             </AnimatedSection>
           ))}
@@ -297,19 +297,19 @@ export default function LandingPage() {
 
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#080c14] text-neutral-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#0f1117] text-neutral-900 dark:text-white transition-colors duration-300">
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-md bg-white/80 dark:bg-[#080c14]/90 border-b border-slate-200 dark:border-white/5 shadow-sm dark:shadow-lg' : 'bg-transparent'
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'backdrop-blur-md bg-white/80 dark:bg-[#0f1117]/90 border-b border-slate-200 dark:border-white/5 shadow-sm dark:shadow-lg' : 'bg-transparent'
         }`}>
 
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center">
                 <Heart size={24} className="text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="text-2xl text-slate-900 dark:text-white font-bold">
                 HealthSync
               </span>
             </Link>
@@ -324,26 +324,26 @@ export default function LandingPage() {
               >
                 <div className="grid grid-cols-2 gap-8">
                   <div>
-                    <h4 className="text-emerald-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-emerald-400/30 pb-2">
+                    <h4 className="text-teal-600 dark:text-teal-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-teal-400/30 pb-2">
                       Core Features
                     </h4>
                     <div className="space-y-3">
                       {CORE_FEATURES.map((feature) => (
-                        <a key={feature.label} href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors group">
-                          <feature.icon size={18} className="text-teal-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
+                        <a key={feature.label} href="#" className="flex items-center gap-3 text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors group">
+                          <feature.icon size={18} className="text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform" />
                           <span>{feature.label}</span>
                         </a>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-cyan-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-cyan-400/30 pb-2">
+                    <h4 className="text-teal-600 dark:text-teal-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-teal-400/30 pb-2">
                       Advanced Features
                     </h4>
                     <div className="space-y-3">
                       {ADVANCED_FEATURES.map((feature) => (
-                        <a key={feature.label} href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors group">
-                          <feature.icon size={18} className="text-teal-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
+                        <a key={feature.label} href="#" className="flex items-center gap-3 text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors group">
+                          <feature.icon size={18} className="text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform" />
                           <span>{feature.label}</span>
                         </a>
                       ))}
@@ -360,32 +360,32 @@ export default function LandingPage() {
               >
                 <div className="grid grid-cols-2 gap-8">
                   <div>
-                    <h4 className="text-emerald-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-emerald-400/30 pb-2">
+                    <h4 className="text-teal-600 dark:text-teal-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-teal-400/30 pb-2">
                       By Specialty
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
                       {SPECIALTIES.map((specialty) => (
-                        <a key={specialty} href="#" className="text-neutral-400 hover:text-white transition-colors py-1">
+                        <a key={specialty} href="#" className="text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-1">
                           {specialty}
                         </a>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-cyan-500 dark:text-cyan-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-cyan-500/30 dark:border-cyan-400/30 pb-2">
+                    <h4 className="text-teal-600 dark:text-teal-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-teal-400/30 pb-2">
                       By Practice Size
                     </h4>
                     <div className="space-y-3">
-                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">
-                        <Stethoscope size={18} className="text-teal-600 dark:text-cyan-400" />
+                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors">
+                        <Stethoscope size={18} className="text-teal-600 dark:text-teal-400" />
                         Solo Practice
                       </a>
-                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">
-                        <Users size={18} className="text-teal-600 dark:text-cyan-400" />
+                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors">
+                        <Users size={18} className="text-teal-600 dark:text-teal-400" />
                         Multi-Doctor Clinic
                       </a>
-                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">
-                        <Building2 size={18} className="text-teal-600 dark:text-cyan-400" />
+                      <a href="#" className="flex items-center gap-3 text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors">
+                        <Building2 size={18} className="text-teal-600 dark:text-teal-400" />
                         Hospital
                       </a>
                     </div>
@@ -400,32 +400,32 @@ export default function LandingPage() {
                 onToggle={() => setOpenDropdown(openDropdown === 'resources' ? null : 'resources')}
               >
                 <div className="space-y-3 min-w-[200px]">
-                  <h4 className="text-emerald-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-emerald-400/30 pb-2">
+                  <h4 className="text-teal-600 dark:text-teal-400 font-semibold text-sm uppercase tracking-wider mb-4 border-b border-teal-400/30 pb-2">
                     Resources
                   </h4>
-                  <a href="#" className="block text-neutral-400 hover:text-white transition-colors py-1">Documentation</a>
-                  <a href="#" className="block text-neutral-400 hover:text-white transition-colors py-1">API Reference</a>
-                  <a href="#" className="block text-neutral-400 hover:text-white transition-colors py-1">Blog</a>
-                  <a href="#" className="block text-neutral-400 hover:text-white transition-colors py-1">Support</a>
-                  <a href="#" className="block text-neutral-400 hover:text-white transition-colors py-1">FAQ</a>
+                  <a href="#" className="block text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-1">Documentation</a>
+                  <a href="#" className="block text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-1">API Reference</a>
+                  <a href="#" className="block text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-1">Blog</a>
+                  <a href="#" className="block text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-1">Support</a>
+                  <a href="#" className="block text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-1">FAQ</a>
                 </div>
               </DropdownMenu>
 
-              <a href="#pricing" className="text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">Pricing</a>
-              <a href="#contact" className="text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors">Contact</a>
+              <a href="#pricing" className="text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors">Pricing</a>
+              <a href="#contact" className="text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors">Contact</a>
             </nav>
 
             {/* CTA Buttons */}
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="hidden md:block px-5 py-2.5 text-slate-700 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white border border-slate-300 dark:border-neutral-700 rounded-lg hover:bg-slate-50 dark:hover:border-neutral-600 transition-colors"
+                className="hidden md:block px-5 py-2.5 text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white border border-slate-300 dark:border-neutral-700 rounded-lg hover:bg-slate-50 dark:hover:border-neutral-600 transition-colors"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="px-5 py-2.5 bg-teal-600 dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-teal-700 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-lg font-medium transition-all hover:shadow-lg dark:hover:shadow-emerald-500/25"
+                className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition-all hover:shadow-md"
               >
                 Get Started Free
               </Link>
@@ -436,13 +436,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-teal-50/30 dark:from-transparent dark:via-transparent dark:to-transparent transition-colors duration-500">
-        {/* Gradient Mesh Background Blobs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse"></div>
-          <div className="absolute top-1/2 -right-60 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[100px] animate-pulse delay-1000"></div>
-          <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-blue-500/8 rounded-full blur-[80px] animate-pulse delay-500"></div>
-        </div>
+      <section className="pt-32 pb-20 px-6 relative overflow-hidden bg-white dark:bg-[#0f1117] transition-colors duration-500">
 
         <div
           ref={heroRef}
@@ -454,12 +448,12 @@ export default function LandingPage() {
             <div className="space-y-8">
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-slate-900 dark:text-white">
                 Simplify Your Practice with{' '}
-                <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 dark:from-emerald-400 dark:via-cyan-400 dark:to-blue-400 bg-clip-text text-transparent">
+                <span className="text-teal-600 dark:text-teal-400">
                   Powerful Healthcare Software
                 </span>
               </h1>
 
-              <p className="text-xl text-slate-600 dark:text-neutral-400 leading-relaxed">
+              <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
                 All-in-one platform for doctors, clinics, and hospitals to manage appointments,
                 medical records, billing, and patient communication — all from one dashboard.
               </p>
@@ -467,22 +461,22 @@ export default function LandingPage() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 dark:bg-gradient-to-r dark:from-emerald-500 dark:to-cyan-500 hover:bg-teal-700 dark:hover:from-emerald-600 dark:hover:to-cyan-600 text-white rounded-xl font-semibold text-lg transition-all hover:shadow-xl dark:hover:shadow-emerald-500/25 hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-semibold text-lg transition-all hover:shadow-md hover:-translate-y-0.5"
                 >
                   <Zap size={20} />
                   Start Free Trial
                 </Link>
                 <button className="inline-flex items-center gap-2 px-8 py-4 border border-slate-200 dark:border-neutral-700 hover:border-slate-400 dark:hover:border-neutral-600 rounded-xl font-semibold text-lg transition-all hover:bg-slate-50 dark:hover:bg-neutral-900 text-slate-700 dark:text-white">
-                  <Play size={20} className="text-teal-600 dark:text-emerald-400" />
+                  <Play size={20} className="text-teal-600 dark:text-teal-400" />
                   Watch Demo
                 </button>
               </div>
             </div>
 
-            {/* Right Content - Dashboard Preview with float animation */}
-            <div className="relative animate-float">
+            {/* Right Content - Dashboard Preview */}
+            <div className="relative">
               <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-slate-200 dark:border-neutral-800 shadow-2xl overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 bg-slate-50/80 dark:bg-[#080c14]/50 border-b border-slate-200 dark:border-neutral-800">
+                <div className="flex items-center gap-2 px-4 py-3 bg-slate-50/80 dark:bg-[#0f1117]/50 border-b border-slate-200 dark:border-neutral-800">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
@@ -494,10 +488,10 @@ export default function LandingPage() {
                     <span className="text-neutral-500 text-sm">Today: 8 Appointments</span>
                   </div>
                   <HeroDashboardStats />
-                  <div className="bg-neutral-100 dark:bg-[#080c14]/50 rounded-lg p-4">
+                  <div className="bg-neutral-100 dark:bg-[#0f1117]/50 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium text-neutral-900 dark:text-white">Appointment Schedule</span>
-                      <span className="text-xs text-emerald-500 dark:text-emerald-400">View All</span>
+                      <span className="text-xs text-teal-600 dark:text-teal-400">View All</span>
                     </div>
                     <div className="space-y-2">
                       {[
@@ -517,13 +511,6 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Floating notification badge */}
-              <div className="absolute -top-4 -right-4 bg-teal-600 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
-                <span className="flex items-center gap-2 text-sm font-medium">
-                  <Check size={16} /> New Patient Added!
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -540,11 +527,11 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-teal-600 dark:text-emerald-400 font-semibold uppercase tracking-wider text-sm">Features</span>
+            <span className="text-teal-600 dark:text-teal-400 font-medium text-sm uppercase tracking-widest">Features</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-slate-900 dark:text-white">
               Everything You Need to Run Your Practice
             </h2>
-            <p className="text-xl text-slate-600 dark:text-neutral-400 max-w-3xl mx-auto">
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
               From appointment scheduling to billing, HealthSync provides all the tools you need to streamline your healthcare practice.
             </p>
           </div>
@@ -577,10 +564,10 @@ export default function LandingPage() {
       <StatsSection />
 
       {/* Testimonials Carousel Section */}
-      <section className="py-24 px-6 bg-slate-50 dark:bg-[#0a0f1a]">
+      <section className="py-24 px-6 bg-slate-50 dark:bg-[#0f1117]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-teal-600 dark:text-emerald-400 font-semibold uppercase tracking-wider text-sm">Testimonials</span>
+            <span className="text-teal-600 dark:text-teal-400 font-medium text-sm uppercase tracking-widest">Testimonials</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 text-slate-900 dark:text-white">
               Loved by Healthcare Professionals
             </h2>
@@ -592,7 +579,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-3xl p-12 text-center relative overflow-hidden">
+          <div className="bg-teal-600 rounded-3xl p-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
             <div className="relative z-10">
               <h2 className="text-white font-bold text-4xl md:text-5xl mb-6">
@@ -627,10 +614,10 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-5 gap-12">
             <div className="md:col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center">
                   <Heart size={24} className="text-white" />
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="text-2xl font-bold text-white">
                   HealthSync
                 </span>
               </Link>

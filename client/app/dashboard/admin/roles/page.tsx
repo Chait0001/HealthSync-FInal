@@ -281,7 +281,7 @@ export default function RolesPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Role Permissions</h1>
-          <p className="text-slate-500 dark:text-neutral-400 mt-1">
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
             Configure and manage access control levels across roles.
           </p>
         </div>
@@ -337,14 +337,14 @@ export default function RolesPage() {
                   {isSystem ? 'system' : role.role_type || 'custom'}
                 </span>
                 {role.scope_level && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-neutral-400 border border-slate-200 dark:border-white/10">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border border-slate-200 dark:border-white/10">
                     <ScopeIcon scope={role.scope_level} />
                     {role.scope_level}
                   </span>
                 )}
               </div>
               <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/5">
-                <p className="text-sm text-slate-500 dark:text-neutral-400">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   <span className="text-lg font-bold text-teal-600 dark:text-teal-400">
                     {permCount}
                   </span>{' '}
@@ -430,7 +430,7 @@ export default function RolesPage() {
 
       {/* Save Bar */}
       <div className="flex flex-wrap gap-4 p-4 bg-slate-50 dark:bg-[#0d1117]/60 border border-slate-200 dark:border-white/5 rounded-2xl items-center justify-between">
-        <div className="text-sm text-slate-500 dark:text-neutral-400 flex items-center gap-2">
+        <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
           <Shield className="w-5 h-5 text-teal-500" />
           <span>
             Select permissions check-boxes and click save to apply RBAC updates.

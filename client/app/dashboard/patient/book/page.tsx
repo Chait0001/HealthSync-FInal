@@ -367,6 +367,9 @@ export default function BookAppointmentPage() {
                 {submitting ? <Loader2 className="animate-spin" /> : <><CheckCircle2 size={18}/> Confirm Appointment</>}
               </Button>
             </div>
+            <p className="text-xs text-slate-400 mt-4 italic">
+              * Appointments are confirmed within 2–4 hours by the hospital team.
+            </p>
           </form>
         )}
 

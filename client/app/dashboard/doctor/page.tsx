@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/services/api';
 import { AppointmentCardSkeleton } from '@/components/ui/Skeleton';
-import { Check, X, Calendar, Clock, Activity } from 'lucide-react';
+import { Check, X, Calendar, Clock, Activity, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { getDoctorIllustration } from '@/constants/doctorIllustrations';
 
@@ -71,49 +71,33 @@ export default function DoctorDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Welcoming hero banner with doctor illustration */}
-      <div className="relative bg-gradient-to-r from-teal-600/10 to-blue-600/5 dark:from-teal-600/20 dark:to-blue-600/10 border border-teal-200 dark:border-teal-500/10 rounded-2xl p-8 mb-8 overflow-hidden shadow-sm dark:shadow-lg dark:shadow-teal-500/5">
-        {/* Animated doctor illustration based on specialization */}
-        <div className="absolute right-6 bottom-0 animate-float hidden md:block opacity-90">
-          {getDoctorIllustration(doctorProfile?.specialization || '')}
+      <div className="mb-6">
+        <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Doctor Dashboard</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Wednesday, {new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}</p>
+      </div>
+
+      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-6 mb-6">
+        <div className="flex items-center gap-3 mb-1">
+          <Shield size={20} className="text-slate-600 dark:text-slate-400" />
+          <h2 className="font-semibold text-slate-800 dark:text-white">Doctor Dashboard</h2>
         </div>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Good Morning, Dr. {user?.name || 'Doctor'}! Here's a quick overview of what's happening with your patients today.
+        </p>
+      </div>
 
-        <div className="relative z-10 md:w-2/3">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Good Morning, Dr. {user?.name || 'Doctor'}! 👋</h2>
-          <p className="text-slate-600 dark:text-neutral-400 text-lg max-w-xl">Here's a quick overview of what's happening with your patients today.</p>
-
-          {/* Quick stats row */}
-          <div className="flex flex-wrap gap-4 mt-8">
-            <div className="bg-white/80 dark:bg-[#080c14]/40 backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
-              <div className="p-3 bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400 rounded-lg">
-                <Calendar size={20} />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-neutral-400 font-medium">Today's Appointments</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.today}</p>
-              </div>
-            </div>
-            
-            <div className="bg-white/80 dark:bg-[#080c14]/40 backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
-              <div className="p-3 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg">
-                <Activity size={20} />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-neutral-400 font-medium">Total Patients</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.total}</p>
-              </div>
-            </div>
-            
-            <div className="bg-white/80 dark:bg-[#080c14]/40 backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
-              <div className="p-3 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 rounded-lg">
-                <Clock size={20} />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-neutral-400 font-medium">Pending Requests</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.pending}</p>
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+        <div className="border border-slate-200 dark:border-white/10 rounded-lg p-4">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Today's Appointments</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.today}</p>
+        </div>
+        <div className="border border-slate-200 dark:border-white/10 rounded-lg p-4">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Total Patients</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.total}</p>
+        </div>
+        <div className="border border-slate-200 dark:border-white/10 rounded-lg p-4">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Pending Requests</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.pending}</p>
         </div>
       </div>
 
@@ -146,7 +130,7 @@ export default function DoctorDashboard() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-500 dark:text-neutral-400 uppercase bg-slate-50 dark:bg-black/20 border-b border-slate-200 dark:border-white/5">
+              <thead className="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-black/20 border-b border-slate-200 dark:border-white/5">
                 <tr>
                   <th className="px-6 py-4 font-medium tracking-wider">Patient</th>
                   <th className="px-6 py-4 font-medium tracking-wider">Date & Time</th>

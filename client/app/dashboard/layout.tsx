@@ -165,7 +165,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (user.role === 'admin') links = adminLinks;
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-[#080c14] text-slate-900 dark:text-white">
+    <div className="flex h-screen bg-slate-50 dark:bg-[#0f1117] text-slate-900 dark:text-white">
       {/* Sidebar */}
       <aside className={`bg-white dark:bg-[#0d1117] border-r border-slate-200 dark:border-white/5 shadow-sm dark:shadow-2xl transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'} flex flex-col z-20`}>
         <div className="h-20 p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
@@ -175,7 +175,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
             <span className="font-bold text-xl bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">HealthSync</span>
           </Link>
-          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-md hover:bg-slate-50 dark:hover:bg-white/5 text-slate-400 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-white transition-colors lg:hidden">
+          <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-1.5 rounded-md hover:bg-slate-50 dark:hover:bg-white/5 text-slate-400 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors lg:hidden">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
         </div>
@@ -190,7 +190,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
                     ? 'bg-teal-50 dark:bg-teal-500/10 border-l-2 border-teal-600 dark:border-teal-400 text-teal-700 dark:text-teal-400 shadow-sm dark:shadow-[0_0_15px_rgba(20,184,166,0.1)]'
-                    : 'text-slate-600 dark:text-neutral-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-teal-600 dark:hover:text-white'
                 }`}
               >
                 <link.icon size={20} className={isActive ? 'text-teal-600 dark:text-teal-400' : ''} />
@@ -200,26 +200,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0a0f18]/50">
-          <div className={`flex items-center gap-3 mb-4 ${!isSidebarOpen && 'justify-center'}`}>
-            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-500/20 border border-teal-100 dark:border-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold shadow-sm">
-              {user.name?.charAt(0) || 'U'}
+        <div className="p-4 border-t border-slate-200 dark:border-white/5">
+          <div className={`flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer ${!isSidebarOpen && 'justify-center'}`}>
+            <div className="relative">
+              <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400 flex items-center justify-center text-sm font-semibold">
+                {(user?.name || 'U').charAt(0).toUpperCase()}
+              </div>
+              <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white dark:border-slate-900"></span>
             </div>
-            <div className={`${!isSidebarOpen && 'hidden'}`}>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">{user.name || 'User'}</p>
-              <span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                user.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20' :
-                user.role === 'doctor' ? 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-400 border border-teal-200 dark:border-teal-500/20' :
-                'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
-              }`}>
-                {user.role}
-              </span>
+            <div className={`flex-1 min-w-0 ${!isSidebarOpen && 'hidden'}`}>
+              <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{user?.name}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{user?.role}</p>
             </div>
           </div>
-          <Button variant="ghost" className="w-full justify-start text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-xl transition-colors px-4" onClick={logout}>
-            <LogOut size={20} className="mr-3" />
-            <span className={`${!isSidebarOpen && 'hidden'} font-medium`}>Logout</span>
-          </Button>
+          <button onClick={logout} className={`mt-2 w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors ${!isSidebarOpen ? 'justify-center' : 'justify-start'}`}>
+            <LogOut size={14} />
+            <span className={`${!isSidebarOpen && 'hidden'}`}>Sign out</span>
+          </button>
         </div>
       </aside>
 

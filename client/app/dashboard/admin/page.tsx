@@ -79,59 +79,33 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Admin Dashboard</h1>
+      <div className="mb-6">
+        <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Admin Dashboard</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Wednesday, {new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}</p>
       </div>
 
-      {/* Admin banner with cartoon SVG */}
-      <div className="relative bg-gradient-to-r from-purple-600/10 to-pink-600/5 dark:from-purple-600/20 dark:to-pink-600/10 border border-purple-200 dark:border-purple-500/10 rounded-2xl p-8 mb-8 overflow-hidden shadow-sm dark:shadow-lg dark:shadow-purple-500/5">
-        {/* Admin cartoon SVG — person with clipboard/laptop */}
-        <div className="absolute right-8 bottom-0 animate-float hidden md:block opacity-90">
-          <svg width="140" height="160" viewBox="0 0 120 140" className="drop-shadow-2xl">
-            <circle cx="60" cy="22" r="18" fill="#f5c5a3"/>
-            <rect x="35" y="40" width="50" height="95" fill="#7c3aed" rx="5"/>
-            <rect x="42" y="55" width="36" height="25" fill="#ddd6fe" rx="3"/> {/* laptop/clipboard */}
-            <rect x="45" y="58" width="30" height="2" fill="#7c3aed"/>
-            <rect x="45" y="63" width="22" height="2" fill="#7c3aed"/>
-            <rect x="45" y="68" width="26" height="2" fill="#7c3aed"/>
-          </svg>
+      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-6 mb-6">
+        <div className="flex items-center gap-3 mb-1">
+          <Shield size={20} className="text-slate-600 dark:text-slate-400" />
+          <h2 className="font-semibold text-slate-800 dark:text-white">Admin Dashboard</h2>
         </div>
-        
-        <div className="relative z-10 md:w-2/3">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">Admin Control Center <Shield className="text-purple-600 dark:text-purple-400" size={28} /></h2>
-          <p className="text-slate-600 dark:text-neutral-400 text-lg max-w-xl">Manage your entire healthcare ecosystem, monitor users, and oversee system health.</p>
-          
-          <div className="flex flex-wrap gap-4 mt-8">
-            <div className="bg-white/80 dark:bg-[#080c14]/40 backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
-              <div className="p-3 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 rounded-lg">
-                <Stethoscope size={20} />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-neutral-400 font-medium">Total Doctors</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.totalDoctors || 0}</p>
-              </div>
-            </div>
-            
-            <div className="bg-white/80 dark:bg-[#080c14]/40 backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
-              <div className="p-3 bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400 rounded-lg">
-                <Users size={20} />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-neutral-400 font-medium">Total Patients</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.totalPatients || 0}</p>
-              </div>
-            </div>
-            
-            <div className="bg-white/80 dark:bg-[#080c14]/40 backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-xl px-5 py-3 flex items-center gap-4">
-              <div className="p-3 bg-pink-100 dark:bg-pink-500/20 text-pink-700 dark:text-pink-400 rounded-lg">
-                <Activity size={20} />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 dark:text-neutral-400 font-medium">Total Users</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.totalUsers || 0}</p>
-              </div>
-            </div>
-          </div>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Manage users, appointments, and system permissions.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+        <div className="border border-slate-200 dark:border-white/10 rounded-lg p-4">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Total Doctors</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.totalDoctors || 0}</p>
+        </div>
+        <div className="border border-slate-200 dark:border-white/10 rounded-lg p-4">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Patients</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.totalPatients || 0}</p>
+        </div>
+        <div className="border border-slate-200 dark:border-white/10 rounded-lg p-4">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Total Users</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats?.totalUsers || 0}</p>
         </div>
       </div>
 
@@ -142,7 +116,7 @@ export default function AdminDashboard() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="text-xs text-slate-500 dark:text-neutral-400 uppercase bg-slate-50 dark:bg-black/20 border-b border-slate-200 dark:border-white/5">
+            <thead className="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-black/20 border-b border-slate-200 dark:border-white/5">
               <tr>
                 <th className="px-6 py-4 font-medium tracking-wider">User</th>
                 <th className="px-6 py-4 font-medium tracking-wider">Email</th>
@@ -172,12 +146,12 @@ export default function AdminDashboard() {
                         <p className="font-medium text-slate-900 dark:text-white">{u.name}</p>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-600 dark:text-neutral-400">{u.email}</td>
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{u.email}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 w-fit ${
-                          u.role === 'admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' :
+                          u.role === 'admin' ? 'bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-400 border-slate-200 dark:border-white/10' :
                           u.role === 'doctor' ? 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400 border-teal-200 dark:border-teal-500/20' :
-                          'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20'
+                          'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-blue-200 dark:border-blue-500/20'
                         }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${
                           u.role === 'admin' ? 'bg-purple-600' :
