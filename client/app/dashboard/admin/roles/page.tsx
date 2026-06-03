@@ -190,19 +190,60 @@ function ScopeIcon({ scope }: { scope: string }) {
   }
 }
 
+// ─── Modal / Field Helpers ───────────────────────────────────────────────────
+const inputCls = "w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function Modal({ title, subtitle, onClose, children }: { title: string; subtitle: string; onClose: () => void; children: React.ReactNode }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md bg-white dark:bg-[#161b27] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5">
+          <div>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white">{title}</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 transition-colors">
+            <X size={16} />
+          </button>
+        </div>
+        <div className="px-6 py-5">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Add Permission Modal ─────────────────────────────────────────────────────
-function AddPermissionModal({ onClose, onCreated }: { onClose: () => void; onCreated: (p: any) => void }) {
-  const [form, setForm] = useState({ module: '', action: '', name: '', category: '' });
+function AddPermissionModal({ onClose, onCreated }: { onClose: () => void; onCreated: (p: Permission) => void }) {
+  const ACTIONS = ['view', 'create', 'update', 'delete', 'manage', 'approve', 'cancel', 'assign', 'export'];
+  const [form, setForm] = useState({ module: '', action: 'view', name: '', category: '' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const previewKey = form.module && form.action
-    ? `${form.module.toLowerCase()}.${form.action.toLowerCase()}`
+    ? `${form.module.toLowerCase().replace(/\s+/g, '_')}.${form.action.toLowerCase()}`
     : '';
 
+  const autoName = () => {
+    if (!form.module) return '';
+    const mod = form.module.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+    const act = form.action.replace(/\b\w/g, (c: string) => c.toUpperCase());
+    return `${act} ${mod}`;
+  };
+
   const submit = async () => {
-    if (!form.module.trim() || !form.action.trim() || !form.name.trim()) {
-      setError('Module, action and display name are required'); return;
+    if (!form.module.trim() || !form.name.trim()) {
+      setError('Module and display name are required'); return;
     }
     setSaving(true); setError('');
     try {
@@ -215,63 +256,54 @@ function AddPermissionModal({ onClose, onCreated }: { onClose: () => void; onCre
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-white dark:bg-[#161b27] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5">
-          <div>
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Add new permission</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Permissions define what actions a role can perform</p>
+    <Modal title="Add new permission" subtitle="Permissions define what actions a role can perform" onClose={onClose}>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Module *">
+          <input className={inputCls} placeholder="e.g. lab_reports" value={form.module}
+            onChange={e => setForm(p => ({ ...p, module: e.target.value }))} />
+        </Field>
+        <Field label="Action *">
+          <div className="relative">
+            <select
+              className={inputCls + ' appearance-none pr-8'}
+              value={form.action}
+              onChange={e => setForm(p => ({ ...p, action: e.target.value }))}>
+              {ACTIONS.map(a => (
+                <option key={a} value={a}>{a.charAt(0).toUpperCase() + a.slice(1)}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 transition-colors">
-            <X size={16} />
-          </button>
-        </div>
-        <div className="px-6 py-5">
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Module *</label>
-              <input className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition"
-                placeholder="e.g. lab_reports" value={form.module}
-                onChange={e => setForm(p => ({ ...p, module: e.target.value }))} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Action *</label>
-              <input className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition"
-                placeholder="e.g. create" value={form.action}
-                onChange={e => setForm(p => ({ ...p, action: e.target.value }))} />
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Display name *</label>
-            <input className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition"
-              placeholder="e.g. Create Lab Report" value={form.name}
-              onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Category (optional)</label>
-            <input className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition"
-              placeholder="e.g. Lab Reports" value={form.category}
-              onChange={e => setForm(p => ({ ...p, category: e.target.value }))} />
-          </div>
-          {previewKey && (
-            <div className="mb-4 px-3 py-2 rounded-lg bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20">
-              <p className="text-xs text-teal-700 dark:text-teal-400">
-                Key preview: <span className="font-mono font-semibold">{previewKey}</span>
-              </p>
-            </div>
-          )}
-          {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
-          <div className="flex gap-2 justify-end">
-            <button onClick={onClose} className="px-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition">Cancel</button>
-            <button onClick={submit} disabled={saving}
-              className="px-5 py-2 text-sm rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium transition flex items-center gap-2 disabled:opacity-60">
-              {saving && <Loader2 size={14} className="animate-spin" />}
-              Add permission
-            </button>
-          </div>
-        </div>
+        </Field>
       </div>
-    </div>
+      <Field label="Display name *">
+        <input className={inputCls}
+          placeholder="e.g. View Lab Reports"
+          value={form.name}
+          onFocus={e => { if (!e.target.value) setForm(p => ({ ...p, name: autoName() })); }}
+          onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+      </Field>
+      <Field label="Category (optional)">
+        <input className={inputCls} placeholder="e.g. Lab Reports" value={form.category}
+          onChange={e => setForm(p => ({ ...p, category: e.target.value }))} />
+      </Field>
+      {previewKey && (
+        <div className="mb-4 px-3 py-2 rounded-lg bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20">
+          <p className="text-xs text-teal-700 dark:text-teal-400">
+            Key preview: <span className="font-mono font-semibold">{previewKey}</span>
+          </p>
+        </div>
+      )}
+      {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
+      <div className="flex gap-2 justify-end mt-2">
+        <button onClick={onClose} className="px-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition">Cancel</button>
+        <button onClick={submit} disabled={saving}
+          className="px-5 py-2 text-sm rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium transition flex items-center gap-2 disabled:opacity-60">
+          {saving && <Loader2 size={14} className="animate-spin" />}
+          Add permission
+        </button>
+      </div>
+    </Modal>
   );
 }
 

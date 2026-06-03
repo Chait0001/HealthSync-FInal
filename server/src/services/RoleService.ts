@@ -83,4 +83,25 @@ export class RoleService {
     await (this.roleRepo as any).model.findByIdAndUpdate(roleId, { status: 'inactive' });
     return { deleted: true };
   }
+
+  async getAllPermissions() {
+    return this.permRepo.findAllActive();
+  }
+
+  async createPermission(data: { key: string; name: string; module: string; action: string; category?: string }) {
+    const existing = await this.permRepo.findByKey(data.key);
+    if (existing) throw new ApiError(`Permission with key '${data.key}' already exists`, 400);
+    return (this.permRepo as any).model.create({
+      ...data,
+      is_system: false,
+      status: 'active',
+    });
+  }
+
+  async deletePermission(id: string) {
+    const perm = await (this.permRepo as any).model.findById(id);
+    if (!perm) throw new ApiError('Permission not found', 404);
+    await (this.permRepo as any).model.findByIdAndUpdate(id, { status: 'inactive' });
+    return { deleted: true };
+  }
 }

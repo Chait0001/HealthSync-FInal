@@ -58,4 +58,26 @@ export class RoleController {
       res.json(ApiResponse.success(result, 'Role deleted'));
     } catch (err) { next(err); }
   };
+
+  getAllPermissions = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const permissions = await this.roleService.getAllPermissions();
+      res.json(ApiResponse.success(permissions, 'Permissions retrieved'));
+    } catch (err) { next(err); }
+  };
+
+  createPermission = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { key, name, module, action, category } = req.body;
+      const perm = await this.roleService.createPermission({ key, name, module, action, category });
+      res.status(201).json(ApiResponse.success(perm, 'Permission created'));
+    } catch (err) { next(err); }
+  };
+
+  deletePermission = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.roleService.deletePermission(String(req.params.permId || req.params.id));
+      res.json(ApiResponse.success(result, 'Permission deleted'));
+    } catch (err) { next(err); }
+  };
 }
