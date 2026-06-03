@@ -8,8 +8,10 @@ export const createRoleRouter = (roleController: RoleController): Router => {
   router.use(authenticate, requireRole('admin'));
 
   router.get('/',                          roleController.getAllRoles);
+  router.post('/',                         roleController.createRole);
   router.get('/:id/permissions',           roleController.getRoleWithPermissions);
   router.put('/:id/permissions',           roleController.setPermissionsForRole);
+  router.delete('/:id',                    roleController.deleteRole);
   router.put('/users/:userId/assign-role', roleController.assignRoleToUser);
 
   return router;

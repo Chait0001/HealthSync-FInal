@@ -54,6 +54,7 @@ export class AuthService implements IAuthService {
       email: user.email,
       role: user.role,
       token: signToken(user._id.toString()),
+      permissions_cache: (user as any).permissions_cache ?? [],
     };
   }
 
@@ -76,6 +77,7 @@ export class AuthService implements IAuthService {
       email: user.email,
       role: user.role,
       token: signToken(user._id.toString()),
+      permissions_cache: (user as any).permissions_cache ?? [],
     };
   }
 

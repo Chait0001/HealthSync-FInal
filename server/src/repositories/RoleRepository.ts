@@ -9,6 +9,6 @@ export class RoleRepository extends BaseRepository<any> {
   }
 
   async findAllActive() {
-    return RoleModel.find({ status: 'active' }).select('name').sort('name');
+    return RoleModel.find({ status: 'active' }).select('name key role_type scope_level').sort('name');
   }
 }

@@ -43,4 +43,19 @@ export class RoleController {
       res.json(ApiResponse.success({ permissions_cache: keys }, 'Role assigned'));
     } catch (err) { next(err); }
   };
+
+  createRole = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { key, name, role_type, scope_level } = req.body;
+      const role = await this.roleService.createRole({ key, name, role_type, scope_level });
+      res.status(201).json(ApiResponse.success(role, 'Role created'));
+    } catch (err) { next(err); }
+  };
+
+  deleteRole = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.roleService.deleteRole(String(req.params.id));
+      res.json(ApiResponse.success(result, 'Role deleted'));
+    } catch (err) { next(err); }
+  };
 }

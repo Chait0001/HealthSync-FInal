@@ -3,6 +3,7 @@ import { DatabaseConnection } from '../config/database';
 import { PermissionModel } from '../models/Permission.model';
 import { RoleModel } from '../models/Role.model';
 import { RolePermissionModel } from '../models/RolePermission';
+import { UserModel } from '../models/User.model';
 
 const PERMISSIONS = [
   { key: 'patients.view',           module: 'patients',      action: 'view',    name: 'View Patients',       category: 'Patients' },
@@ -66,7 +67,25 @@ async function seed() {
     await RolePermissionModel.insertMany(inserts);
   }
   console.log('✅ Role-permissions assigned');
+
+  // Migrate existing users: populate permissions_cache based on their role string
+  const users = await UserModel.find({});
+  let migratedCount = 0;
+  for (const user of users) {
+    const userRole = (user as any).role;
+    if (!userRole) continue;
+    const role = roleMap[userRole];
+    if (!role) continue;
+    // Get permission keys for this role
+    const rolePermDocs = await RolePermissionModel.find({ role_id: role._id, effect: 'allow' });
+    const permKeys = rolePermDocs.map(rp => rp.permission_key);
+    await UserModel.findByIdAndUpdate(user._id, { $set: { permissions_cache: permKeys } });
+    migratedCount++;
+  }
+  console.log(`✅ Migrated permissions_cache for ${migratedCount} existing users`);
+
   process.exit(0);
 }
 
 seed().catch(console.error);
+
