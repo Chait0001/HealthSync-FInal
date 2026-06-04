@@ -318,8 +318,7 @@ export default function RolesPage() {
   const [showAddPerm, setShowAddPerm] = useState(false);
   const [deletingRoleId, setDeletingRoleId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-
-  const timeouts = useRef<Record<string, NodeJS.Timeout>>({});
+  const [savingPermissions, setSavingPermissions] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -330,24 +329,6 @@ export default function RolesPage() {
     const timer = setTimeout(() => setToast(null), 3000);
     return () => clearTimeout(timer);
   }, [toast]);
-
-  const debouncedUpdate = (roleId: string, permissionKey: string, value: boolean) => {
-    const key = `${roleId}-${permissionKey}`;
-    if (timeouts.current[key]) {
-      clearTimeout(timeouts.current[key]);
-    }
-    timeouts.current[key] = setTimeout(async () => {
-      try {
-        await api.put(`/roles/${roleId}/permissions`, {
-          permissionKey,
-          value,
-        });
-        showToast("Permission updated — changes reflect immediately on user dashboards");
-      } catch (err) {
-        console.error('Failed to update permission', err);
-      }
-    }, 500);
-  };
 
 
   const fetchData = async () => {
@@ -389,19 +370,42 @@ export default function RolesPage() {
   }, []);
 
   const toggle = (roleId: string, permKey: string) => {
-    let nextValue = false;
     setSelected((prev) => {
       const set = new Set(prev[roleId] ?? []);
       if (set.has(permKey)) {
         set.delete(permKey);
-        nextValue = false;
       } else {
         set.add(permKey);
-        nextValue = true;
       }
       return { ...prev, [roleId]: set };
     });
-    debouncedUpdate(roleId, permKey, nextValue);
+  };
+
+  const handleSavePermissions = async () => {
+    setSavingPermissions(true);
+    try {
+      await Promise.all(
+        roles.map(async (role) => {
+          const roleSelectedSet = selected[role._id] || new Set();
+          
+          // Build the complete permissions map for this role
+          const rolePermissionsMap: Record<string, boolean> = {};
+          permissions.forEach((p: any) => {
+            rolePermissionsMap[p.key] = roleSelectedSet.has(p.key);
+          });
+          
+          await api.put(`/roles/${role._id}/permissions`, {
+            permissions: rolePermissionsMap
+          });
+        })
+      );
+      showToast("Permissions saved successfully — changes reflect immediately across active dashboards!");
+    } catch (err) {
+      console.error("Failed to save permissions", err);
+      alert("Failed to save permissions. Please try again.");
+    } finally {
+      setSavingPermissions(false);
+    }
   };
 
   const handleDelete = async (roleId: string, roleName: string) => {
@@ -601,14 +605,26 @@ export default function RolesPage() {
         </div>
       </div>
 
-      {/* Auto-save Status Banner */}
+      {/* Save Permissions Action Banner */}
       <div className="flex flex-wrap gap-4 p-4 bg-slate-50 dark:bg-[#0d1117]/60 border border-slate-200 dark:border-white/5 rounded-2xl items-center justify-between">
         <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
           <Shield className="w-5 h-5 text-teal-500" />
           <span>
-            Permissions checkboxes update in real-time. Changes will reflect instantly on all active user dashboards.
+            Select fields to configure access levels, then click Save Permissions to update active user sessions.
           </span>
         </div>
+        <Button
+          onClick={handleSavePermissions}
+          disabled={savingPermissions}
+          className="bg-teal-600 hover:bg-teal-700 text-white gap-2 font-medium px-6 py-2 rounded-xl transition shadow-lg hover:shadow-teal-500/20"
+        >
+          {savingPermissions ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Save size={16} />
+          )}
+          {savingPermissions ? 'Saving...' : 'Save Permissions'}
+        </Button>
       </div>
 
       {/* Floating Toast Notification */}

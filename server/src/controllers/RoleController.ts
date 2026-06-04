@@ -27,11 +27,17 @@ export class RoleController {
         const rolePermissions = await RolePermissionModel.find({ role_id: roleId, effect: 'allow' });
         role.permissions = new Map();
         for (const rp of rolePermissions) {
-          role.permissions.set(rp.permission_key, true);
+          const escapedKey = rp.permission_key.replace(/\./g, '_dot_');
+          role.permissions.set(escapedKey, true);
         }
         await role.save();
       }
-      const permissionsMap = Object.fromEntries(role.permissions);
+      
+      const permissionsMap: Record<string, boolean> = {};
+      for (const [k, v] of role.permissions.entries()) {
+        const unescapedKey = k.replace(/_dot_/g, '.');
+        permissionsMap[unescapedKey] = v;
+      }
       res.json(ApiResponse.success(permissionsMap, 'Role permissions map retrieved'));
     } catch (err) { next(err); }
   };
@@ -39,11 +45,7 @@ export class RoleController {
   setPermissionsForRole = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const roleId = String(req.params.id);
-      const { permissionKey, value } = req.body;
-      if (!permissionKey) {
-        res.status(400).json(ApiResponse.error('permissionKey is required', 400));
-        return;
-      }
+      const { permissionKey, value, permissions } = req.body;
 
       const role = await (this.roleService as any).roleRepo.findById(roleId);
       if (!role) {
@@ -51,11 +53,28 @@ export class RoleController {
         return;
       }
 
-      if (!role.permissions) {
-        role.permissions = new Map();
+      if (permissions && typeof permissions === 'object') {
+        if (!role.permissions) {
+          role.permissions = new Map();
+        } else {
+          role.permissions.clear();
+        }
+        for (const [k, v] of Object.entries(permissions)) {
+          const escapedKey = k.replace(/\./g, '_dot_');
+          role.permissions.set(escapedKey, Boolean(v));
+        }
+      } else {
+        if (!permissionKey) {
+          res.status(400).json(ApiResponse.error('permissionKey or permissions object is required', 400));
+          return;
+        }
+        if (!role.permissions) {
+          role.permissions = new Map();
+        }
+        const escapedKey = permissionKey.replace(/\./g, '_dot_');
+        role.permissions.set(escapedKey, value);
       }
 
-      role.permissions.set(permissionKey, value);
       await role.save();
 
       // Emit socket event
@@ -66,14 +85,24 @@ export class RoleController {
       for (const u of users) {
         const activePerms: string[] = [];
         for (const [k, v] of role.permissions.entries()) {
-          if (v === true) activePerms.push(k);
+          if (v === true) {
+            const unescapedKey = k.replace(/_dot_/g, '.');
+            activePerms.push(unescapedKey);
+          }
         }
         await (this.roleService as any).userRepo.updatePermissionsCache(u._id.toString(), activePerms);
       }
 
-      const permissionsMap = Object.fromEntries(role.permissions);
-      res.json(ApiResponse.success(permissionsMap, 'Permission updated successfully'));
-    } catch (err) { next(err); }
+      const permissionsMap: Record<string, boolean> = {};
+      for (const [k, v] of role.permissions.entries()) {
+        const unescapedKey = k.replace(/_dot_/g, '.');
+        permissionsMap[unescapedKey] = v;
+      }
+      res.json(ApiResponse.success(permissionsMap, 'Permissions updated successfully'));
+    } catch (err) {
+      console.error('Error in setPermissionsForRole:', err);
+      next(err);
+    }
   };
 
   assignRoleToUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
