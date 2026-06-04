@@ -99,4 +99,8 @@ async getAllPermissions(): Promise<any[]> {
     if (!appt) throw new ApiError('Appointment not found', 404);
     return appt;
   }
+
+  async getAppointmentById(id: string): Promise<IAppointment | null> {
+    return this.appointmentRepo.findById(id);
+  }
 }

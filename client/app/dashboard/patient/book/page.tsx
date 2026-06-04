@@ -6,10 +6,11 @@ import api from '@/services/api';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Loader2, HeartPulse, Sparkles, Calendar as CalendarIcon, FileText, CheckCircle2, ChevronRight, UserRound, ArrowLeft } from 'lucide-react';
+import { Loader2, HeartPulse, Sparkles, Calendar as CalendarIcon, Calendar, FileText, CheckCircle2, ChevronRight, UserRound, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getSpecializationsForSymptom, SYMPTOM_SPECIALIZATION_MAP } from '@/constants/symptomMapping';
-import { PermissionGate } from '@/components/PermissionGate';
+import { useAuth } from '@/context/AuthContext';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 interface Doctor {
   _id: string;
@@ -26,6 +27,7 @@ const SUGGESTIONS = Object.keys(SYMPTOM_SPECIALIZATION_MAP).filter(key => key !=
 
 export default function BookAppointmentPage() {
   const router = useRouter();
+  const { can } = useAuth();
   
   // Data
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -120,8 +122,17 @@ export default function BookAppointmentPage() {
   }
 
   return (
-    <PermissionGate permission="appointments.create">
-      <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {!can('appointments.create') ? (
+        <div className="flex flex-col items-center justify-center h-[50vh] gap-3 text-slate-500 dark:text-slate-400">
+          <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center mb-2">
+            <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          </div>
+          <p className="text-base font-semibold text-slate-700 dark:text-white">Permission required</p>
+          <p className="text-sm text-center max-w-xs">You do not have permission to book appointments. Contact your hospital admin.</p>
+        </div>
+      ) : (
+        <>
         
         {/* Header */}
         <div className="mb-8">
@@ -375,7 +386,8 @@ export default function BookAppointmentPage() {
           )}
 
         </Card>
-      </div>
-    </PermissionGate>
+      </>
+      )}
+    </div>
   );
 }

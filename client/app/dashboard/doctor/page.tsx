@@ -6,7 +6,7 @@ import { AppointmentCardSkeleton } from '@/components/ui/Skeleton';
 import { Check, X, Calendar, Clock, Activity, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { getDoctorIllustration } from '@/constants/doctorIllustrations';
-import { PermissionGate } from '@/components/PermissionGate';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 interface Appointment {
   _id: string;
@@ -21,7 +21,7 @@ interface Appointment {
 }
 
 export default function DoctorDashboard() {
-  const { user } = useAuth();
+  const { user, can } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctorProfile, setDoctorProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -103,7 +103,11 @@ export default function DoctorDashboard() {
       </div>
 
       {/* Appointments Table */}
-      <PermissionGate permission="appointments.view">
+      <PermissionGuard permission="appointments.view" fallback={
+        <div className="text-center py-16 text-slate-400">
+          <p>You do not have permission to view appointments.</p>
+        </div>
+      }>
         <div className="bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-xl">
           <div className="p-6 border-b border-slate-200 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-white/[0.02]">
             <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Recent Appointments</h3>
@@ -137,8 +141,7 @@ export default function DoctorDashboard() {
                     <th className="px-6 py-4 font-medium tracking-wider">Patient</th>
                     <th className="px-6 py-4 font-medium tracking-wider">Date & Time</th>
                     <th className="px-6 py-4 font-medium tracking-wider">Reason</th>
-                    <th className="px-6 py-4 font-medium tracking-wider">Status</th>
-                    <th className="px-6 py-4 font-medium tracking-wider text-right">Actions</th>
+                    <th className="px-6 py-4 font-medium tracking-wider text-right">Status / Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -165,37 +168,58 @@ export default function DoctorDashboard() {
                       <td className="px-6 py-4">
                         <p className="text-slate-600 dark:text-neutral-300 max-w-[200px] truncate" title={apt.reason}>{apt.reason}</p>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 w-fit ${
-                          apt.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 border-green-200 dark:border-green-500/20' :
-                          apt.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 border-red-200 dark:border-red-500/20' : 
-                          'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/20'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            apt.status === 'approved' ? 'bg-green-600' :
-                            apt.status === 'cancelled' ? 'bg-red-600' : 
-                            'bg-yellow-600'
-                          }`}></span>
-                          {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
-                        </span>
-                      </td>
                       <td className="px-6 py-4 text-right">
-                        {apt.status === 'pending' ? (
-                          <div className="flex justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                            <PermissionGate permission="appointments.approve">
-                              <button onClick={() => handleStatusUpdate(apt._id, 'approved')} className="p-2 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-green-400 rounded-lg transition-all hover:scale-105" title="Approve">
-                                <Check size={16} />
+                        <div className="flex flex-col items-end gap-1.5">
+                          {/* Status badge */}
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 w-fit ${
+                            apt.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 border-green-200 dark:border-green-500/20' :
+                            apt.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 border-red-200 dark:border-red-500/20' :
+                            'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/20'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              apt.status === 'approved' ? 'bg-green-600' :
+                              apt.status === 'cancelled' ? 'bg-red-600' :
+                              'bg-yellow-600'
+                            }`}></span>
+                            {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                          </span>
+
+                          {/* Approve + Decline — only if doctor has appointments.approve AND appointment is pending */}
+                          {can('appointments.approve') && apt.status === 'pending' && (
+                            <div className="flex gap-2 mt-1">
+                              <button
+                                onClick={() => handleStatusUpdate(apt._id, 'approved')}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 text-green-600 dark:text-green-400 transition-all"
+                                title="Approve appointment"
+                              >
+                                <Check size={13} /> Approve
                               </button>
-                            </PermissionGate>
-                            <PermissionGate permission="appointments.cancel">
-                              <button onClick={() => handleStatusUpdate(apt._id, 'cancelled')} className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-lg transition-all hover:scale-105" title="Decline">
-                                <X size={16} />
+                              <button
+                                onClick={() => handleStatusUpdate(apt._id, 'cancelled')}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-600 dark:text-red-400 transition-all"
+                                title="Decline appointment"
+                              >
+                                <X size={13} /> Decline
                               </button>
-                            </PermissionGate>
-                          </div>
-                        ) : (
-                          <span className="text-neutral-600 text-sm italic">Processed</span>
-                        )}
+                            </div>
+                          )}
+
+                          {/* Cancel — only if doctor has appointments.cancel AND appointment is approved */}
+                          {can('appointments.cancel') && apt.status === 'approved' && (
+                            <button
+                              onClick={() => handleStatusUpdate(apt._id, 'cancelled')}
+                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all mt-1"
+                              title="Cancel appointment"
+                            >
+                              <X size={13} /> Cancel
+                            </button>
+                          )}
+
+                          {/* No actions available fallback */}
+                          {!can('appointments.approve') && !can('appointments.cancel') && apt.status === 'pending' && (
+                            <span className="text-xs text-slate-400 dark:text-slate-500 italic">No actions available</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -204,7 +228,7 @@ export default function DoctorDashboard() {
             </div>
           )}
         </div>
-      </PermissionGate>
+      </PermissionGuard>
     </div>
   );
 }

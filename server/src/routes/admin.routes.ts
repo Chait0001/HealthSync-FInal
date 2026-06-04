@@ -16,6 +16,7 @@ export const createAdminRouter = (adminController: AdminController): Router => {
   router.get('/appointments/pending', adminController.getPendingAppointments);
   router.get('/appointments/scheduled', adminController.getScheduledAppointments);
   router.put('/appointments/:id/approve', adminController.approveAppointment);
+  router.post('/appointments/:id/send-reminder', adminController.sendReminder);
   router.get('/roles', adminController.getAllRoles);
   router.get('/permissions', adminController.getAllPermissions);
 

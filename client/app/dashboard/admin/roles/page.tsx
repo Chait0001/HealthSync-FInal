@@ -4,6 +4,7 @@ import { useEffect, useState, Fragment, useRef } from 'react';
 import api from '@/services/api';
 import { Button } from '@/components/ui/Button';
 import { PermissionGate } from '@/components/PermissionGate';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
 import {
   Shield,
   Save,
@@ -319,6 +320,7 @@ export default function RolesPage() {
   const [deletingRoleId, setDeletingRoleId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [savingPermissions, setSavingPermissions] = useState(false);
+  const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -379,6 +381,28 @@ export default function RolesPage() {
       }
       return { ...prev, [roleId]: set };
     });
+  };
+
+  const save = async (roleId: string) => {
+    setSavingRoleId(roleId);
+    try {
+      const role = roles.find(r => r._id === roleId);
+      if (!role) return;
+      const roleSelectedSet = selected[roleId] || new Set();
+      const rolePermissionsMap: Record<string, boolean> = {};
+      permissions.forEach((p: any) => {
+        rolePermissionsMap[p.key] = roleSelectedSet.has(p.key);
+      });
+      await api.put(`/roles/${roleId}/permissions`, {
+        permissions: rolePermissionsMap
+      });
+      showToast(`${role.name} permissions saved successfully!`);
+    } catch (err) {
+      console.error('Failed to save permissions', err);
+      alert('Failed to save permissions. Please try again.');
+    } finally {
+      setSavingRoleId(null);
+    }
   };
 
   const handleSavePermissions = async () => {
@@ -459,16 +483,18 @@ export default function RolesPage() {
           <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Role Permissions</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Configure and manage access control levels across roles.</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setShowAddPerm(true)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition font-medium">
-            <Plus size={15} /> Add permission
-          </button>
-          <button onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg bg-teal-600 hover:bg-teal-700 text-white transition font-medium">
-            <Plus size={15} /> Create role
-          </button>
-        </div>
+        <PermissionGuard permission="roles.manage">
+          <div className="flex gap-2">
+            <button onClick={() => setShowAddPerm(true)}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition font-medium">
+              <Plus size={15} /> Add permission
+            </button>
+            <button onClick={() => setShowCreate(true)}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg bg-teal-600 hover:bg-teal-700 text-white transition font-medium">
+              <Plus size={15} /> Create role
+            </button>
+          </div>
+        </PermissionGuard>
       </div>
 
       {/* Role Cards */}
@@ -610,21 +636,28 @@ export default function RolesPage() {
         <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
           <Shield className="w-5 h-5 text-teal-500" />
           <span>
-            Select fields to configure access levels, then click Save Permissions to update active user sessions.
+            Select fields to configure access levels, then click Save to update active user sessions.
           </span>
         </div>
-        <Button
-          onClick={handleSavePermissions}
-          disabled={savingPermissions}
-          className="bg-teal-600 hover:bg-teal-700 text-white gap-2 font-medium px-6 py-2 rounded-xl transition shadow-lg hover:shadow-teal-500/20"
-        >
-          {savingPermissions ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Save size={16} />
-          )}
-          {savingPermissions ? 'Saving...' : 'Save Permissions'}
-        </Button>
+        <PermissionGuard permission="roles.manage">
+          <div className="flex flex-wrap gap-2">
+            {roles.map(r => (
+              <Button
+                key={r._id}
+                onClick={() => save(r._id)}
+                disabled={savingRoleId !== null}
+                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all flex items-center gap-1.5"
+              >
+                {savingRoleId === r._id ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save size={14} />
+                )}
+                Save {r.name}
+              </Button>
+            ))}
+          </div>
+        </PermissionGuard>
       </div>
 
       {/* Floating Toast Notification */}

@@ -8,6 +8,7 @@ export const createAuthRouter = (authController: AuthController): Router => {
   router.post('/register', authController.register);
   router.post('/login', authController.login);
   router.get('/me', authenticate, authController.getMe);
+  router.put('/profile', authenticate, authController.updateProfile);
 
   return router;
 };

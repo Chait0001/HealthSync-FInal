@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { IAuthService } from '../interfaces/IServices';
 import { ApiResponse } from '../utils/ApiResponse';
+import { AuthRequest } from '../middleware/auth.middleware';
 
 /**
  * AuthController — SRP: only translates HTTP ↔ service calls.
@@ -33,5 +34,14 @@ export class AuthController {
     } catch (err) {
       next(err);
     }
+  };
+
+  updateProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { phone, age, gender, address, bloodGroup } = req.body;
+      const userId = req.user!._id.toString();
+      const updated = await this.authService.updateProfile(userId, { phone, age, gender, address, bloodGroup });
+      res.json(ApiResponse.success(updated, 'Profile updated successfully'));
+    } catch (err) { next(err); }
   };
 }

@@ -8,6 +8,7 @@ export const createAppointmentRouter = (appointmentController: AppointmentContro
 
   router.get('/my', authenticate, appointmentController.getMyAppointments);
   router.post('/', authenticate, requirePermission('appointments.create'), appointmentController.bookAppointment);
+  router.put('/:id/status', authenticate, appointmentController.updateStatus);
 
   return router;
 };

@@ -40,7 +40,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser({
+          ...parsedUser,
+          permissions_cache: parsedUser.permissions_cache ?? []
+        });
       } catch (e) {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
@@ -53,9 +57,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const response = await api.post('/auth/login', { email, password });
     const userData = response.data.data || response.data; // Handle both standard and wrapped responses
 
-    localStorage.setItem('user', JSON.stringify(userData));
+    const userToSave = {
+      ...userData,
+      permissions_cache: userData.permissions_cache ?? []
+    };
+
+    localStorage.setItem('user', JSON.stringify(userToSave));
     localStorage.setItem('token', userData.token);
-    setUser(userData);
+    setUser(userToSave);
 
     // Redirect based on role
     if (userData.role === 'admin') router.push('/dashboard/admin');
@@ -67,9 +76,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const response = await api.post('/auth/register', submitData);
     const userData = response.data.data || response.data;
 
-    localStorage.setItem('user', JSON.stringify(userData));
+    const userToSave = {
+      ...userData,
+      permissions_cache: userData.permissions_cache ?? []
+    };
+
+    localStorage.setItem('user', JSON.stringify(userToSave));
     localStorage.setItem('token', userData.token);
-    setUser(userData);
+    setUser(userToSave);
 
     // Redirect based on role
     if (userData.role === 'admin') router.push('/dashboard/admin');

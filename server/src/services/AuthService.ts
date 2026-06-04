@@ -41,6 +41,7 @@ export class AuthService implements IAuthService {
 
     // Assign role and refresh permissions cache
     const permissions = await this.roleService.assignRoleToUser(user._id.toString(), role, 'system');
+    user.permissions_cache = permissions;
 
     // If doctor, create doctor profile
     if (role === 'doctor') {
@@ -69,7 +70,13 @@ export class AuthService implements IAuthService {
       role: user.role,
       roleId,
       token: signToken(user._id.toString()),
-      permissions_cache: permissions ?? [],
+      permissions_cache: user.permissions_cache ?? [],
+      phone: user.phone || '',
+      age: user.age,
+      gender: user.gender || '',
+      address: user.address || '',
+      bloodGroup: user.bloodGroup || '',
+      createdAt: user.createdAt,
     };
   }
 
@@ -101,11 +108,28 @@ export class AuthService implements IAuthService {
       role: user.role,
       roleId,
       token: signToken(user._id.toString()),
-      permissions_cache: (user as any).permissions_cache ?? [],
+      permissions_cache: user.permissions_cache ?? [],
+      phone: user.phone || '',
+      age: user.age,
+      gender: user.gender || '',
+      address: user.address || '',
+      bloodGroup: user.bloodGroup || '',
+      createdAt: user.createdAt,
     };
   }
 
   async verifyToken(token: string): Promise<JwtPayload & { id: string }> {
     return verifyToken(token);
+  }
+
+  async updateProfile(userId: string, data: { phone?: string; age?: number; gender?: string; address?: string; bloodGroup?: string }) {
+    const allowed = ['phone', 'age', 'gender', 'address', 'bloodGroup'];
+    const update: any = {};
+    for (const key of allowed) {
+      if (data[key as keyof typeof data] !== undefined && data[key as keyof typeof data] !== '') {
+        update[key] = data[key as keyof typeof data];
+      }
+    }
+    return this.userRepo.updateProfile(userId, update);
   }
 }

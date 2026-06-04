@@ -13,10 +13,13 @@ import {
   LogOut,
   FileText,
   Stethoscope,
-  ShieldCheck
+  ShieldCheck,
+  UserCircle,
+  Clock as ClockIcon
 } from 'lucide-react';
 import { PermissionsProvider } from '@/context/PermissionsContext';
 import { usePermission } from '@/hooks/usePermission';
+import { NotificationBell } from '@/components/NotificationBell';
 
 // Skeleton Loading for the entire dashboard layout
 function DashboardSkeleton() {
@@ -116,7 +119,9 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
 
   const patientLinks = [
     { href: '/dashboard/patient', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/patient/profile', label: 'My Profile', icon: UserCircle },
     { href: '/dashboard/patient/appointments', label: 'My Appointments', icon: Calendar, permission: 'appointments.view' },
+    { href: '/dashboard/patient/history/appointments', label: 'Appointment History', icon: ClockIcon },
     { href: '/dashboard/patient/history', label: 'Medical History', icon: FileText, permission: 'patients.view' },
   ];
 
@@ -199,9 +204,14 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto p-8 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          {children}
+      <main className="flex-1 overflow-auto relative z-10">
+        <div className="sticky top-0 z-10 flex items-center justify-end px-6 py-3 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#0f1117]/80 backdrop-blur-sm">
+          <NotificationBell />
+        </div>
+        <div className="p-6 md:p-8">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </div>
       </main>
     </div>

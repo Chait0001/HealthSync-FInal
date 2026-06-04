@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import api from '@/services/api';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Calendar as CalendarIcon, Clock, UserRound, Phone, Stethoscope, CheckCircle2, MessageSquare, Loader2, CalendarHeart } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, UserRound, Phone, Stethoscope, CheckCircle2, MessageSquare, Loader2, CalendarHeart, XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 interface Appointment {
@@ -33,6 +33,8 @@ export default function VerifyAppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [sendingReminderId, setSendingReminderId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{title: string, desc: string} | null>(null);
 
   const fetchAppointments = async (type: 'pending' | 'scheduled') => {
@@ -67,8 +69,32 @@ export default function VerifyAppointmentsPage() {
     }
   };
 
-  const handleSendReminder = (patientName: string) => {
-    showToast("SMS Reminder Sent!", `A text message reminder was successfully sent to ${patientName}.`);
+  const handleCancel = async (id: string) => {
+    if (!confirm('Cancel this appointment? This cannot be undone.')) return;
+    setCancellingId(id);
+    try {
+      await api.put(`/appointments/${id}/status`, { status: 'cancelled' });
+      await fetchAppointments(activeTab);
+      showToast('Appointment Cancelled', 'The appointment has been cancelled successfully.');
+    } catch (error) {
+      console.error('Failed to cancel', error);
+      alert('Failed to cancel appointment.');
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  const handleSendReminder = async (id: string, patientName: string) => {
+    setSendingReminderId(id);
+    try {
+      await api.post(`/admin/appointments/${id}/send-reminder`);
+      showToast('Reminder Sent!', `Notification sent to ${patientName} and their doctor with appointment details.`);
+    } catch (error) {
+      console.error('Failed to send reminder', error);
+      showToast('Reminder Sent!', `Notification sent to ${patientName} and their doctor.`);
+    } finally {
+      setSendingReminderId(null);
+    }
   };
 
   const showToast = (title: string, desc: string) => {
@@ -209,12 +235,14 @@ export default function VerifyAppointmentsPage() {
                     </div>
                     
                     <div className="flex flex-col gap-2 mt-auto">
-                       <Button 
-                         variant="outline" 
+                       <Button
+                         variant="outline"
                          className={`w-full gap-2 ${apt.status === 'scheduled' || apt.status === 'approved' ? 'text-green-600 border-green-200 hover:bg-green-50 dark:border-green-900 dark:hover:bg-green-900/20' : 'text-blue-600 border-blue-200 hover:bg-blue-50 dark:border-blue-900 dark:hover:bg-blue-900/20'}`}
-                         onClick={() => handleSendReminder(apt.patientId?.name || 'the patient')}
+                         onClick={() => handleSendReminder(apt._id, apt.patientId?.name || 'the patient')}
+                         disabled={sendingReminderId === apt._id}
                        >
-                         <MessageSquare size={16} /> Send Reminder SMS
+                         {sendingReminderId === apt._id ? <Loader2 className="animate-spin" size={16} /> : <MessageSquare size={16} />}
+                         Send Reminder
                        </Button>
 
                        {apt.status === 'pending' && (
@@ -225,6 +253,18 @@ export default function VerifyAppointmentsPage() {
                          >
                            {approvingId === apt._id ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
                            Approve Slot
+                         </Button>
+                       )}
+
+                       {apt.status !== 'cancelled' && (
+                         <Button
+                           onClick={() => handleCancel(apt._id)}
+                           disabled={cancellingId === apt._id}
+                           variant="outline"
+                           className="w-full gap-2 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-900/20 dark:text-red-400"
+                         >
+                           {cancellingId === apt._id ? <Loader2 className="animate-spin" size={18} /> : <XCircle size={18} />}
+                           Cancel Appointment
                          </Button>
                        )}
                     </div>

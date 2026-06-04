@@ -6,8 +6,9 @@ import api from '@/services/api';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Skeleton, TableRowSkeleton } from '@/components/ui/Skeleton';
-import { PermissionGate } from '@/components/PermissionGate';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
 import { Users, ArrowLeft, Trash2, Mail, Shield, Plus, X, ChevronDown, Loader2, UserPlus, Eye, EyeOff } from 'lucide-react';
+
 
 interface User {
   _id: string;
@@ -262,10 +263,12 @@ export default function AllUsersPage() {
             <p className="text-sm text-slate-500 dark:text-slate-400">{users.length} total members</p>
           </div>
         </div>
-        <button onClick={() => setShowAdd(true)}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition">
-          <Plus size={15} /> Add user
-        </button>
+        <PermissionGuard permission="users.view">
+          <button onClick={() => setShowAdd(true)}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition">
+            <Plus size={15} /> Add user
+          </button>
+        </PermissionGuard>
       </div>
 
       <div className="flex gap-2">
@@ -282,7 +285,7 @@ export default function AllUsersPage() {
         ))}
       </div>
 
-      <PermissionGate permission="users.view">
+      <PermissionGuard permission="users.view">
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50">
@@ -332,7 +335,7 @@ export default function AllUsersPage() {
                       {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="p-4 text-right">
-                      <PermissionGate permission="users.delete">
+                      <PermissionGuard permission="users.delete">
                         <Button
                           size="sm"
                           variant="ghost"
@@ -341,7 +344,7 @@ export default function AllUsersPage() {
                         >
                           <Trash2 size={16} />
                         </Button>
-                      </PermissionGate>
+                      </PermissionGuard>
                     </td>
                   </tr>
                 ))
@@ -349,7 +352,7 @@ export default function AllUsersPage() {
             </tbody>
           </table>
         </div>
-      </PermissionGate>
+      </PermissionGuard>
     </div>
   );
 }

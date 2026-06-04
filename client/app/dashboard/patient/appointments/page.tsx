@@ -7,7 +7,8 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { AppointmentCardSkeleton, StatCardSkeleton } from '@/components/ui/Skeleton';
 import { Calendar, ArrowLeft, Plus } from 'lucide-react';
-import { PermissionGate } from '@/components/PermissionGate';
+import { useAuth } from '@/context/AuthContext';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 interface Appointment {
   _id: string;
@@ -21,6 +22,7 @@ interface Appointment {
 }
 
 export default function MyAppointmentsPage() {
+  const { can } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,14 +62,19 @@ export default function MyAppointmentsPage() {
           </Link>
           <h1 className="text-3xl font-bold text-white">My Appointments</h1>
         </div>
-        <PermissionGate permission="appointments.create">
+        <PermissionGuard permission="appointments.create">
           <Link href="/dashboard/patient/book">
             <Button className="gap-2"><Plus size={16} /> Book New</Button>
           </Link>
-        </PermissionGate>
+        </PermissionGuard>
       </div>
 
-      <PermissionGate permission="appointments.view">
+      <PermissionGuard permission="appointments.view" fallback={
+        <div className="text-center py-16 text-slate-500 dark:text-slate-400">
+          <Calendar className="mx-auto mb-3 opacity-20" size={48} />
+          <p>You do not have permission to view appointments.</p>
+        </div>
+      }>
         {loading ? (
           <div className="grid gap-4">
             <AppointmentCardSkeleton />
@@ -80,11 +87,11 @@ export default function MyAppointmentsPage() {
             <CardContent className="text-center py-12 text-slate-500">
               <Calendar className="mx-auto mb-3 opacity-20" size={48} />
               <p>No appointments found</p>
-              <PermissionGate permission="appointments.create">
+              <PermissionGuard permission="appointments.create">
                 <Link href="/dashboard/patient/book">
                   <Button className="mt-4">Book Your First Appointment</Button>
                 </Link>
-              </PermissionGate>
+              </PermissionGuard>
             </CardContent>
           </Card>
         ) : (
@@ -112,12 +119,25 @@ export default function MyAppointmentsPage() {
                       {apt.status}
                     </span>
                   </div>
+                  {can('appointments.cancel') && apt.status !== 'cancelled' && apt.status !== 'completed' && (
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Cancel this appointment?')) return;
+                        try {
+                          await api.put(`/appointments/${apt._id}/status`, { status: 'cancelled' });
+                          setAppointments(prev => prev.map(a => a._id === apt._id ? { ...a, status: 'cancelled' } : a));
+                        } catch { alert('Failed to cancel appointment'); }
+                      }}
+                      className="mt-3 w-full text-sm px-4 py-2 rounded-lg border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition">
+                      Cancel Appointment
+                    </button>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
-      </PermissionGate>
+      </PermissionGuard>
     </div>
   );
 }

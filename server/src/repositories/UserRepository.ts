@@ -23,6 +23,14 @@ async updatePermissionsCache(userId: string, permissions: string[]) {
   );
 }
 
+async updateProfile(userId: string, updateData: any) {
+  return UserModel.findByIdAndUpdate(
+    userId,
+    { $set: updateData },
+    { new: true }
+  ).select('-password');
+}
+
   async findByEmail(email: string, withPassword = false): Promise<IUser | null> {
     const query = this.model.findOne({ email });
     return withPassword ? query.select('+password').exec() : query.exec();

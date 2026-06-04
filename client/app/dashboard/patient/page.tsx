@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { AppointmentCardSkeleton } from '@/components/ui/Skeleton';
 import { Calendar, Plus, Clock, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { PermissionGate } from '@/components/PermissionGate';
+import { PermissionGuard } from '@/components/auth/PermissionGuard';
 
 interface Appointment {
   _id: string;
@@ -21,7 +21,7 @@ interface Appointment {
 }
 
 export default function PatientDashboard() {
-  const { user } = useAuth();
+  const { user, can } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,13 +56,13 @@ export default function PatientDashboard() {
           <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Patient Dashboard</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Wednesday, {new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}</p>
         </div>
-        <PermissionGate permission="appointments.create">
+        <PermissionGuard permission="appointments.create">
           <Link href="/dashboard/patient/book">
             <Button className="gap-2 bg-teal-600 hover:bg-teal-700 border-none">
               <Plus size={16} /> Book Appointment
             </Button>
           </Link>
-        </PermissionGate>
+        </PermissionGuard>
       </div>
 
       <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-6 mb-6">
@@ -87,7 +87,11 @@ export default function PatientDashboard() {
       </div>
 
       {/* Appointments Table */}
-      <PermissionGate permission="appointments.view">
+      <PermissionGuard permission="appointments.view" fallback={
+        <div className="text-center py-12 text-slate-400 dark:text-slate-500">
+          <p className="text-sm">You do not have permission to view appointments. Contact your admin.</p>
+        </div>
+      }>
         <div className="bg-white dark:bg-[#0d1117] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-xl">
           <div className="p-6 border-b border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
             <h3 className="font-semibold text-lg text-slate-900 dark:text-white">My Appointments</h3>
@@ -117,13 +121,13 @@ export default function PatientDashboard() {
               </div>
               <p className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Appointments</p>
               <p className="text-neutral-500 max-w-sm mx-auto mb-6">You don't have any appointments scheduled yet. Book your first appointment to get started.</p>
-              <PermissionGate permission="appointments.create">
+              <PermissionGuard permission="appointments.create">
                 <Link href="/dashboard/patient/book">
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white border-none">
                     Book Appointment
                   </Button>
                 </Link>
-              </PermissionGate>
+              </PermissionGuard>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -161,20 +165,37 @@ export default function PatientDashboard() {
                         <p className="text-slate-600 dark:text-neutral-300 max-w-[250px] truncate" title={apt.reason}>{apt.reason}</p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border items-center gap-1.5 w-fit ${
-                          apt.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 border-green-200 dark:border-green-500/20' :
-                          apt.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 border-red-200 dark:border-red-500/20' : 
-                          apt.status === 'completed' ? 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400 border-slate-200 dark:border-slate-500/20' :
-                          'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/20'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            apt.status === 'approved' ? 'bg-green-600' :
-                            apt.status === 'cancelled' ? 'bg-red-600' : 
-                            apt.status === 'completed' ? 'bg-slate-600' :
-                            'bg-yellow-600'
-                          }`}></span>
-                          {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
-                        </span>
+                        <div className="flex flex-col items-end gap-2">
+                          <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border items-center gap-1.5 w-fit ${
+                            apt.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 border-green-200 dark:border-green-500/20' :
+                            apt.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 border-red-200 dark:border-red-500/20' :
+                            apt.status === 'completed' ? 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400 border-slate-200 dark:border-slate-500/20' :
+                            'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/20'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              apt.status === 'approved' ? 'bg-green-600' :
+                              apt.status === 'cancelled' ? 'bg-red-600' :
+                              apt.status === 'completed' ? 'bg-slate-600' : 'bg-yellow-600'
+                            }`}></span>
+                            {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                          </span>
+                          {can('appointments.cancel') && apt.status !== 'cancelled' && apt.status !== 'completed' && (
+                            <button
+                              onClick={async () => {
+                                if (!confirm('Cancel this appointment?')) return;
+                                try {
+                                  await api.put(`/appointments/${apt._id}/status`, { status: 'cancelled' });
+                                  setAppointments(prev => prev.map(a => a._id === apt._id ? { ...a, status: 'cancelled' } : a));
+                                  setTimeout(() => {
+                                    setAppointments(prev => prev.filter(a => a._id !== apt._id));
+                                  }, 5000);
+                                } catch { alert('Failed to cancel appointment'); }
+                              }}
+                              className="text-xs px-3 py-1 rounded-lg border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition">
+                              Cancel
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -183,7 +204,7 @@ export default function PatientDashboard() {
             </div>
           )}
         </div>
-      </PermissionGate>
+      </PermissionGuard>
     </div>
   );
 }

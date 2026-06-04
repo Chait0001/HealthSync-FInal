@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { IAdminService } from '../interfaces/IServices';
 import { ApiResponse } from '../utils/ApiResponse';
+import { NotificationModel } from '../models/Notification.model';
 
 export class AdminController {
   constructor(private readonly adminService: IAdminService) {}
@@ -82,5 +83,49 @@ export class AdminController {
     } catch (err) {
       next(err);
     }
+  };
+
+  sendReminder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const appointment = await this.adminService.getAppointmentById(String(req.params.id));
+      if (!appointment) {
+        res.status(404).json({ message: 'Appointment not found' });
+        return;
+      }
+
+      const dateStr = new Date(appointment.date).toLocaleDateString('en-IN', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
+      const timeStr = new Date(appointment.date).toLocaleTimeString('en-IN', {
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      const patientId = (appointment.patientId as any)?._id || appointment.patientId;
+      const doctorUserId = (appointment.doctorId as any)?.userId?._id || (appointment.doctorId as any)?.userId;
+      const doctorName = (appointment.doctorId as any)?.userId?.name || 'your doctor';
+      const patientName = (appointment.patientId as any)?.name || 'your patient';
+
+      // Notify patient
+      await NotificationModel.create({
+        userId: patientId,
+        title: 'Appointment Reminder',
+        message: `Reminder: You have an appointment with Dr. ${doctorName} on ${dateStr} at ${timeStr}.`,
+        type: 'reminder',
+        appointmentId: appointment._id,
+      });
+
+      // Notify doctor
+      if (doctorUserId) {
+        await NotificationModel.create({
+          userId: doctorUserId,
+          title: 'Appointment Reminder',
+          message: `Reminder: You have an appointment with patient ${patientName} on ${dateStr} at ${timeStr}.`,
+          type: 'reminder',
+          appointmentId: appointment._id,
+        });
+      }
+
+      res.json(ApiResponse.success(null, 'Reminder notifications sent successfully'));
+    } catch (err) { next(err); }
   };
 }

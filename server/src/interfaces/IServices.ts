@@ -8,6 +8,7 @@ export interface IAuthService {
   register(data: RegisterDTO): Promise<AuthResponse>;
   login(data: LoginDTO): Promise<AuthResponse>;
   verifyToken(token: string): Promise<JwtPayload & { id: string }>;
+  updateProfile(userId: string, data: { phone?: string; age?: number; gender?: string; address?: string; bloodGroup?: string }): Promise<any>;
 }
 
 // ─── Doctor ───────────────────────────────────────────────────────────────────
@@ -21,6 +22,7 @@ export interface IDoctorService {
 export interface IAppointmentService {
   getMyAppointments(userId: string, role: string): Promise<IAppointment[]>;
   bookAppointment(patientId: string, data: BookAppointmentDTO): Promise<IAppointment>;
+  updateAppointmentStatus(appointmentId: string, status: string, userId: string, role: string): Promise<IAppointment>;
 }
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
@@ -35,6 +37,7 @@ export interface IAdminService {
   getAllPermissions(): Promise<any[]>;
   assignRoleToUser(userId: string, roleKey: string, adminId: string): Promise<any>;
   createUser(data: any): Promise<any>;
+  getAppointmentById(id: string): Promise<IAppointment | null>;
 }
 
 // Re-export all DTOs for convenience

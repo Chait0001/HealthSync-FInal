@@ -15,14 +15,31 @@ export class AppointmentService implements IAppointmentService {
     if (role === 'patient') {
       return this.appointmentRepo.findByPatientId(userId);
     }
-
     if (role === 'doctor') {
       const doctor = await this.doctorRepo.findByUserId(userId);
       if (!doctor) throw new ApiError('Doctor profile not found', 404);
       return this.appointmentRepo.findByDoctorId(doctor._id.toString());
     }
+    return [];
+  }
 
-    return []; // Admin sees nothing here — use AdminService instead
+  async updateAppointmentStatus(appointmentId: string, status: string, userId: string, role: string): Promise<IAppointment> {
+    const appointment = await this.appointmentRepo.findById(appointmentId);
+    if (!appointment) throw new ApiError('Appointment not found', 404);
+
+    if (role === 'patient') {
+      if (appointment.patientId.toString() !== userId) throw new ApiError('Not your appointment', 403);
+      if (status !== 'cancelled') throw new ApiError('Patients can only cancel appointments', 403);
+    }
+
+    if (role === 'doctor') {
+      const doctor = await this.doctorRepo.findByUserId(userId);
+      if (!doctor || appointment.doctorId.toString() !== doctor._id.toString()) throw new ApiError('Not your appointment', 403);
+    }
+
+    const updated = await this.appointmentRepo.updateStatus(appointmentId, status as any);
+    if (!updated) throw new ApiError('Failed to update appointment', 500);
+    return updated;
   }
 
   async bookAppointment(patientId: string, data: BookAppointmentDTO): Promise<IAppointment> {
@@ -30,7 +47,6 @@ export class AppointmentService implements IAppointmentService {
     if (!doctorId || !date || !reason) {
       throw new ApiError('Please provide doctorId, date and reason', 400);
     }
-
     return this.appointmentRepo.create({
       patientId: new Types.ObjectId(patientId),
       doctorId: new Types.ObjectId(doctorId),

@@ -59,4 +59,10 @@ export interface AuthResponse {
   roleId?: string;
   token: string;
   permissions_cache: string[];
+  phone?: string;
+  age?: number;
+  gender?: string;
+  address?: string;
+  bloodGroup?: string;
+  createdAt?: Date;
 }

@@ -35,6 +35,7 @@ import { createDoctorRouter } from './routes/doctor.routes';
 import { createAppointmentRouter } from './routes/appointment.routes';
 import { createAdminRouter } from './routes/admin.routes';
 import { createRoleRouter } from './routes/role.routes';
+import notificationRouter from './routes/notification.routes';
 
 // Middleware
 import { errorMiddleware } from './middleware/error.middleware';
@@ -88,6 +89,7 @@ app.use('/api/doctors',      createDoctorRouter(doctorController));
 app.use('/api/appointments', createAppointmentRouter(appointmentController));
 app.use('/api/admin',        createAdminRouter(adminController));
 app.use('/api/roles',        createRoleRouter(roleController));
+app.use('/api/notifications', notificationRouter);
 
 app.get('/', (_req, res) => res.json({ message: 'HealthSync API running ✅' }));
 
