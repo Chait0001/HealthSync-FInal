@@ -8,7 +8,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
-  role: 'patient' | 'doctor' | 'admin';
+  role: string; // open — supports custom roles beyond patient/doctor/admin
   roleId?: string;
   token: string;
   permissions_cache: string[]; 
@@ -69,7 +69,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Redirect based on role
     if (userData.role === 'admin') router.push('/dashboard/admin');
     else if (userData.role === 'doctor') router.push('/dashboard/doctor');
-    else router.push('/dashboard/patient');
+    else if (userData.role === 'patient') router.push('/dashboard/patient');
+    else router.push('/dashboard/custom');
   };
 
   const register = async (submitData: any) => {
@@ -88,7 +89,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Redirect based on role
     if (userData.role === 'admin') router.push('/dashboard/admin');
     else if (userData.role === 'doctor') router.push('/dashboard/doctor');
-    else router.push('/dashboard/patient');
+    else if (userData.role === 'patient') router.push('/dashboard/patient');
+    else router.push('/dashboard/custom');
   };
 
   const logout = () => {

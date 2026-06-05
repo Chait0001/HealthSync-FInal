@@ -15,7 +15,14 @@ interface User {
   name: string;
   email: string;
   role: string;
+  roles?: { role_name: string; role_key: string }[];
   createdAt: string;
+}
+
+interface RoleOption {
+  _id: string;
+  key: string;
+  name: string;
 }
 
 const inputCls2 = "w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition";
@@ -63,6 +70,24 @@ function AddUserModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [allRoles, setAllRoles] = useState<RoleOption[]>([]);
+
+  // Fetch all roles (system + custom) from DB
+  useEffect(() => {
+    api.get('/admin/roles')
+      .then(res => {
+        const data: RoleOption[] = res.data.data || res.data || [];
+        setAllRoles(data);
+      })
+      .catch(() => {
+        // Fallback to defaults if fetch fails
+        setAllRoles([
+          { _id: 'patient', key: 'patient', name: 'Patient' },
+          { _id: 'doctor',  key: 'doctor',  name: 'Doctor' },
+          { _id: 'admin',   key: 'admin',   name: 'Admin' },
+        ]);
+      });
+  }, []);
 
   const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
 
@@ -106,9 +131,18 @@ function AddUserModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
             <Field2 label="Role" required>
               <div className="relative">
                 <select className={inputCls2 + ' appearance-none pr-8'} value={form.role} onChange={e => set('role', e.target.value)}>
-                  <option value="patient">Patient</option>
-                  <option value="doctor">Doctor</option>
-                  <option value="admin">Admin</option>
+                  {allRoles.length > 0
+                    ? allRoles.map(r => (
+                        <option key={r._id} value={r.key}>{r.name}</option>
+                      ))
+                    : (
+                        <>
+                          <option value="patient">Patient</option>
+                          <option value="doctor">Doctor</option>
+                          <option value="admin">Admin</option>
+                        </>
+                      )
+                  }
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -237,10 +271,23 @@ export default function AllUsersPage() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-red-100 text-red-700';
-      case 'doctor': return 'bg-green-100 text-green-700';
-      default: return 'bg-blue-100 text-blue-700';
+      case 'admin':   return 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400';
+      case 'doctor':  return 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400';
+      case 'patient': return 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400';
+      default:        return 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400';
     }
+  };
+
+  // Derive unique roles from the current user list for filter tabs
+  const uniqueRoles = ['all', ...Array.from(new Set(usersList.map(u => u.role)))];
+
+  // Display name: prefer roles[0].role_name (proper label), fall back to role string
+  const getRoleDisplayName = (user: User): string => {
+    if (user.roles && user.roles.length > 0 && user.roles[0].role_name) {
+      return user.roles[0].role_name;
+    }
+    // Capitalise the legacy role string
+    return user.role.charAt(0).toUpperCase() + user.role.slice(1);
   };
 
   return (
@@ -271,8 +318,8 @@ export default function AllUsersPage() {
         </PermissionGuard>
       </div>
 
-      <div className="flex gap-2">
-        {['all', 'patient', 'doctor', 'admin'].map((f) => (
+      <div className="flex gap-2 flex-wrap">
+        {uniqueRoles.map((f) => (
           <Button
             key={f}
             variant={filter === f ? 'primary' : 'outline'}
@@ -328,7 +375,7 @@ export default function AllUsersPage() {
                     <td className="p-4 text-slate-600">{user.email}</td>
                     <td className="p-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${getRoleColor(user.role)}`}>
-                        {user.role}
+                        {getRoleDisplayName(user)}
                       </span>
                     </td>
                     <td className="p-4 text-slate-500 text-sm">

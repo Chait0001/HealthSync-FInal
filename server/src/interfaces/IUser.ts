@@ -13,7 +13,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: 'patient' | 'doctor' | 'admin';
+  role: string; // open — supports custom roles beyond patient/doctor/admin
   roles?: IUserRole[];
   permissions_cache?: string[];
   department_id?: Types.ObjectId;
@@ -31,7 +31,7 @@ export interface RegisterDTO {
   name: string;
   email: string;
   password: string;
-  role?: 'patient' | 'doctor' | 'admin';
+  role?: string; // supports custom roles
   // Patient extras
   age?: number;
   gender?: string;

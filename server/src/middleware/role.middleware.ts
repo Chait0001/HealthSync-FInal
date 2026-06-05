@@ -8,10 +8,19 @@ import { ApiError } from '../utils/ApiError';
  */
 export const requireRole = (...roles: string[]) => {
   return (req: AuthRequest, _res: Response, next: NextFunction): void => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user) {
       return next(new ApiError('Access denied: insufficient permissions', 403));
     }
-    next();
+    // Check legacy role field first (fast path for patient/doctor/admin)
+    if (roles.includes(req.user.role)) {
+      return next();
+    }
+    // Also check the roles[] array (supports custom roles)
+    const userRoleKeys = (req.user as any).roles?.map((r: any) => r.role_key) ?? [];
+    if (userRoleKeys.some((k: string) => roles.includes(k))) {
+      return next();
+    }
+    return next(new ApiError('Access denied: insufficient permissions', 403));
   };
 };
 

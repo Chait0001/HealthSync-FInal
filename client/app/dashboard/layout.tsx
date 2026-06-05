@@ -142,6 +142,9 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   let links = patientLinks;
   if (user?.role === 'doctor') links = doctorLinks;
   if (user?.role === 'admin') links = adminLinks;
+  if (user?.role !== 'admin' && user?.role !== 'doctor' && user?.role !== 'patient') {
+    links = [{ href: '/dashboard/custom', label: 'Dashboard', icon: LayoutDashboard }];
+  }
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-[#0f1117] text-slate-900 dark:text-white">
@@ -235,13 +238,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const isDoctorRoute = pathname.startsWith('/dashboard/doctor');
       const isPatientRoute = pathname.startsWith('/dashboard/patient');
 
+      const knownRoles = ['admin', 'doctor', 'patient'];
       // Redirect to correct dashboard based on role
       if (isAdminRoute && user.role !== 'admin') {
-        router.replace(`/dashboard/${user.role}`);
+        router.replace(knownRoles.includes(user.role) ? `/dashboard/${user.role}` : '/dashboard/custom');
       } else if (isDoctorRoute && user.role !== 'doctor') {
-        router.replace(`/dashboard/${user.role}`);
+        router.replace(knownRoles.includes(user.role) ? `/dashboard/${user.role}` : '/dashboard/custom');
       } else if (isPatientRoute && user.role !== 'patient') {
-        router.replace(`/dashboard/${user.role}`);
+        router.replace(knownRoles.includes(user.role) ? `/dashboard/${user.role}` : '/dashboard/custom');
       }
     }
   }, [user, loading, router, pathname]);
