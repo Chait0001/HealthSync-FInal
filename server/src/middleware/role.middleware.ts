@@ -32,9 +32,10 @@ export const requirePermission = (...permissions: string[]) => {
       return next(new ApiError('Not authenticated', 401));
     }
     const cache = req.user.permissions_cache ?? [];
-    const hasPermission = permissions.every(p => cache.includes(p));
+    // ANY of the listed permissions is sufficient (OR semantics)
+    const hasPermission = permissions.some(p => cache.includes(p));
     if (!hasPermission) {
-      return next(new ApiError(`Access denied: missing permission(s): ${permissions.join(', ')}`, 403));
+      return next(new ApiError(`Access denied: missing required permission`, 403));
     }
     next();
   };
