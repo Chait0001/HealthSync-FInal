@@ -21,11 +21,12 @@ export const createAdminRouter = (adminController: AdminController): Router => {
     adminController.getScheduledAppointments
   );
 
+  router.get('/users', authenticate, adminController.getAllUsers);
+
   // All remaining admin routes require authentication + admin role
   router.use(authenticate, requireRole('admin'));
 
   router.get('/stats', adminController.getStats);
-  router.get('/users', adminController.getAllUsers);
   router.post('/users', adminController.createUser);
   router.delete('/users/:id', adminController.deleteUser);
   router.put('/appointments/:id/approve', adminController.approveAppointment);
