@@ -127,6 +127,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
 
   const doctorLinks = [
     { href: '/dashboard/doctor', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/doctor/profile', label: 'My Profile', icon: UserCircle },
     { href: '/dashboard/doctor/appointments', label: 'Appointments', icon: Calendar, permission: 'appointments.view' },
     { href: '/dashboard/doctor/patients', label: 'My Patients', icon: Users, permission: 'patients.view' },
   ];

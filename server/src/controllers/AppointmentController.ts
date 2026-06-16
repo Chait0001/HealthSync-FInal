@@ -32,8 +32,9 @@ export class AppointmentController {
 
   bookAppointment = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const patientId = req.body.patientId || req.user!._id.toString();
       const appointment = await this.appointmentService.bookAppointment(
-        req.user!._id.toString(),
+        patientId,
         req.body
       );
       res.status(201).json(ApiResponse.success(appointment, 'Appointment booked', 201));

@@ -23,26 +23,45 @@ interface Doctor {
 
 const inputCls = "w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 transition";
 
+interface Patient {
+  _id: string;
+  name: string;
+  email: string;
+}
+
 function BookModal({ onClose, onBooked }: { onClose: () => void; onBooked: () => void }) {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [form, setForm] = useState({ doctorId: '', date: '', time: '09:00', reason: '' });
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [form, setForm] = useState({ patientId: '', doctorId: '', date: '', time: '09:00', reason: '' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.get('/doctors').then(res => setDoctors(res.data.data || res.data || [])).catch(console.error);
+    Promise.all([
+      api.get('/doctors'),
+      api.get('/admin/users')
+    ]).then(([resDocs, resUsers]) => {
+      setDoctors(resDocs.data.data || resDocs.data || []);
+      const allUsers = resUsers.data.data || resUsers.data || [];
+      setPatients(allUsers.filter((u: any) => u.role === 'patient'));
+    }).catch(console.error);
   }, []);
 
   const submit = async () => {
-    if (!form.doctorId || !form.date || !form.reason) { setError('All fields are required'); return; }
+    if (!form.patientId || !form.doctorId || !form.date || !form.reason) { setError('All fields are required'); return; }
     setSaving(true); setError('');
     try {
       const dateTime = new Date(`${form.date}T${form.time}:00`);
-      await api.post('/appointments', { doctorId: form.doctorId, date: dateTime.toISOString(), reason: form.reason });
+      await api.post('/appointments', {
+        patientId: form.patientId,
+        doctorId: form.doctorId,
+        date: dateTime.toISOString(),
+        reason: form.reason
+      });
       onBooked();
       onClose();
     } catch (e: any) {
-      setError(e.response?.data?.message || 'Failed to book appointment');
+      setError(e.response?.data?.message || 'Failed to create appointment');
     } finally { setSaving(false); }
   };
 
@@ -51,12 +70,24 @@ function BookModal({ onClose, onBooked }: { onClose: () => void; onBooked: () =>
       <div className="w-full max-w-md bg-white dark:bg-[#161b27] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5">
           <div>
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Book Appointment</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Schedule a new appointment</p>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Create Appointment</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Schedule a new appointment for a patient</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400"><X size={16} /></button>
         </div>
-        <div className="px-6 py-5 space-y-4">
+        <div className="px-6 py-5 space-y-4 select-dropdown-container">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Select Patient *</label>
+            <div className="relative">
+              <select className={inputCls + ' appearance-none pr-8'} value={form.patientId} onChange={e => setForm(p => ({ ...p, patientId: e.target.value }))}>
+                <option value="">Choose a patient</option>
+                {patients.map(p => (
+                  <option key={p._id} value={p._id}>{p.name} ({p.email})</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Select Doctor *</label>
             <div className="relative">
@@ -89,7 +120,7 @@ function BookModal({ onClose, onBooked }: { onClose: () => void; onBooked: () =>
           <button onClick={onClose} className="px-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition">Cancel</button>
           <button onClick={submit} disabled={saving} className="px-5 py-2 text-sm rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium transition flex items-center gap-2 disabled:opacity-60">
             {saving && <Loader2 size={14} className="animate-spin" />}
-            {saving ? 'Booking...' : 'Book appointment'}
+            {saving ? 'Creating...' : 'Create appointment'}
           </button>
         </div>
       </div>
@@ -185,7 +216,7 @@ export default function CustomAppointmentsPage() {
         {canCreate && (
           <button onClick={() => setShowBook(true)}
             className="flex items-center gap-2 px-4 py-2 text-sm bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition">
-            <Plus size={15} /> Book Appointment
+            <Plus size={15} /> Create Appointment
           </button>
         )}
       </div>
@@ -207,7 +238,7 @@ export default function CustomAppointmentsPage() {
           <div className="py-16 text-center">
             <Calendar size={32} className="mx-auto mb-3 text-slate-300 dark:text-slate-600" />
             <p className="text-sm text-slate-500 dark:text-slate-400">No {filter === 'all' ? '' : filter} appointments found</p>
-            {canCreate && <button onClick={() => setShowBook(true)} className="mt-3 text-sm text-teal-600 dark:text-teal-400 hover:underline">Book first appointment</button>}
+            {canCreate && <button onClick={() => setShowBook(true)} className="mt-3 text-sm text-teal-600 dark:text-teal-400 hover:underline">Create first appointment</button>}
           </div>
         ) : (
           <table className="w-full text-sm">
