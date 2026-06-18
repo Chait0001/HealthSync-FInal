@@ -9,6 +9,7 @@ export const createDoctorRouter = (doctorController: DoctorController): Router =
   router.get('/', doctorController.getAllDoctors);
   router.get('/me', authenticate, requireRole('doctor'), doctorController.getMyProfile);
   router.put('/me', authenticate, requireRole('doctor'), doctorController.updateMyProfile);
+  router.get('/:doctorId', doctorController.getDoctorById);
 
   return router;
 };

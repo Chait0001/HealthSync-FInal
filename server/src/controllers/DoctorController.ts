@@ -15,6 +15,15 @@ export class DoctorController {
     }
   };
 
+  getDoctorById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const doctor = await this.doctorService.getDoctorById(req.params.doctorId as string);
+      res.status(200).json(ApiResponse.success(doctor, 'Doctor profile retrieved'));
+    } catch (err) {
+      next(err);
+    }
+  };
+
   getMyProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const doctor = await this.doctorService.getDoctorByUserId(req.user!._id.toString());

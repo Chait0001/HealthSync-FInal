@@ -11,6 +11,10 @@ export class DoctorRepository extends BaseRepository<IDoctor> {
     return this.model.findOne({ userId }).populate('userId', 'name email phone').exec();
   }
 
+  async findByIdWithUserInfo(id: string): Promise<IDoctor | null> {
+    return this.model.findById(id).populate('userId', 'name email phone').exec();
+  }
+
   async findAllWithUserInfo(): Promise<IDoctor[]> {
     return this.model.find({}).populate('userId', 'name email phone').exec();
   }

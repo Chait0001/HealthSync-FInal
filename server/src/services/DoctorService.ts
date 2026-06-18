@@ -17,6 +17,12 @@ export class DoctorService implements IDoctorService {
     return doctor;
   }
 
+  async getDoctorById(id: string): Promise<IDoctor | null> {
+    const doctor = await this.doctorRepo.findByIdWithUserInfo(id);
+    if (!doctor) throw new ApiError('Doctor profile not found', 404);
+    return doctor;
+  }
+
   async updateDoctorProfile(userId: string, data: UpdateDoctorDTO): Promise<IDoctor | null> {
     const doctor = await this.doctorRepo.findByUserId(userId);
     if (!doctor) throw new ApiError('Doctor profile not found', 404);

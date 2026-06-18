@@ -15,6 +15,7 @@ export interface IAuthService {
 export interface IDoctorService {
   getAllDoctors(): Promise<IDoctor[]>;
   getDoctorByUserId(userId: string): Promise<IDoctor | null>;
+  getDoctorById(id: string): Promise<IDoctor | null>;
   updateDoctorProfile(userId: string, data: UpdateDoctorDTO): Promise<IDoctor | null>;
 }
 

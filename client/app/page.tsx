@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { ModeToggle } from '@/components/ModeToggle';
 import AnimatedSection from '@/components/shared/AnimatedSection';
+import { DoctorsSection } from '@/components/sections/DoctorsSection';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CORE_FEATURES, ADVANCED_FEATURES, SPECIALTIES, TESTIMONIALS, MAIN_FEATURES } from '@/constants/landing';
 
@@ -411,6 +412,7 @@ export default function LandingPage() {
                 </div>
               </DropdownMenu>
 
+              <a href="#our-doctors" className="text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors">Our Doctors</a>
               <a href="#pricing" className="text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors">Pricing</a>
               <a href="#contact" className="text-slate-700 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors">Contact</a>
             </nav>
@@ -562,6 +564,9 @@ export default function LandingPage() {
 
       {/* Stats Section */}
       <StatsSection />
+
+      {/* Our Specialists Section */}
+      <DoctorsSection />
 
       {/* Testimonials Carousel Section */}
       <section className="py-24 px-6 bg-slate-50 dark:bg-[#0f1117]">
