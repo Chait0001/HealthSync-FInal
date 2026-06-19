@@ -48,10 +48,21 @@ export class AuthService implements IAuthService {
       await this.doctorRepo.create({
         userId: user._id,
         specialization: otherDetails.specialization,
+        specialities: otherDetails.specialities || [],
         experience: otherDetails.experience,
         feesPerConsultation: otherDetails.feesPerConsultation,
         department: otherDetails.department,
         bio: otherDetails.bio,
+        designation: otherDetails.designation,
+        hospitalName: otherDetails.hospitalName || 'HealthSync Clinic',
+        opdTimings: otherDetails.opdTimings,
+        opdSchedule: otherDetails.opdSchedule || [],
+        education: otherDetails.education,
+        publications: otherDetails.publications,
+        awards: otherDetails.awards,
+        languagesSpoken: otherDetails.languagesSpoken,
+        memberships: otherDetails.memberships,
+        profilePhoto: otherDetails.profilePhoto,
       } as any);
     }
 

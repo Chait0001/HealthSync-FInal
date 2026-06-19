@@ -40,10 +40,22 @@ export interface RegisterDTO {
   bloodGroup?: string;
   // Doctor extras
   specialization?: string;
+  specialities?: string[];
   experience?: number;
   feesPerConsultation?: number;
   department?: string;
   bio?: string;
+  languagesSpoken?: string[];
+  memberships?: string[];
+  profilePhoto?: string;
+  workExperience?: any[];
+  education?: any[];
+  awards?: any[];
+  publications?: any[];
+  designation?: string;
+  hospitalName?: string;
+  opdTimings?: string;
+  opdSchedule?: Array<{ day: string; startTime: string; endTime: string }>;
 }
 
 export interface LoginDTO {

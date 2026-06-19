@@ -49,13 +49,7 @@ export default function SignupPage() {
     gender: 'Male',
     address: '',
     phone: '',
-    bloodGroup: '',
-    // Doctor specific
-    specialization: '',
-    experience: '',
-    feesPerConsultation: '',
-    department: '',
-    bio: ''
+    bloodGroup: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -107,9 +101,7 @@ export default function SignupPage() {
     try {
       const submissionData = {
         ...formData,
-        age: Number(formData.age) || 0,
-        experience: Number(formData.experience) || 0,
-        feesPerConsultation: Number(formData.feesPerConsultation) || 0
+        age: Number(formData.age) || 0
       };
       await register(submissionData);
     } catch (err: any) {
@@ -184,9 +176,14 @@ export default function SignupPage() {
                         onChange={handleChange}
                       >
                         <option value="patient">Patient</option>
-                        <option value="doctor">Doctor</option>
                         <option value="admin">Admin</option>
                       </select>
+                      <p className="text-xs text-slate-400 mt-1.5">
+                        Are you a doctor?{' '}
+                        <Link href="/signup/doctor" className="text-teal-400 hover:underline font-medium">
+                          Register here instead
+                        </Link>
+                      </p>
                     </div>
                     <div className="space-y-2 col-span-2">
                       <label className={labelClassName}>Full Name</label>
@@ -213,80 +210,42 @@ export default function SignupPage() {
 
               {step === 2 && (
                 <div className="space-y-4">
-                  {formData.role === 'patient' ? (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className={labelClassName}>Age</label>
-                        <Input type="number" name="age" value={formData.age} onChange={handleChange} required className={inputClassName} />
-                      </div>
-                      <div className="space-y-2">
-                        <label className={labelClassName}>Gender</label>
-                        <select name="gender" className={selectClassName} value={formData.gender} onChange={handleChange}>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Other">Other</option>
-                        </select>
-                      </div>
-                      <div className="space-y-2 col-span-2">
-                        <label className={labelClassName}>Phone</label>
-                        <Input name="phone" value={formData.phone} onChange={handleChange} required className={inputClassName} />
-                      </div>
-                      <div className="space-y-2 col-span-2">
-                        <label className={labelClassName}>Address</label>
-                        <Input name="address" value={formData.address} onChange={handleChange} required className={inputClassName} />
-                      </div>
-                      <div className="space-y-2">
-                        <label className={labelClassName}>Blood Group</label>
-                        <select name="bloodGroup" className={selectClassName} value={formData.bloodGroup} onChange={handleChange}>
-                          <option value="" disabled>Select Blood Group</option>
-                          <option value="A+">A+</option>
-                          <option value="A-">A-</option>
-                          <option value="B+">B+</option>
-                          <option value="B-">B-</option>
-                          <option value="AB+">AB+</option>
-                          <option value="AB-">AB-</option>
-                          <option value="O+">O+</option>
-                          <option value="O-">O-</option>
-                        </select>
-                      </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className={labelClassName}>Age</label>
+                      <Input type="number" name="age" value={formData.age} onChange={handleChange} required className={inputClassName} />
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2 col-span-2">
-                        <label className={labelClassName}>Specialization</label>
-                        <select
-                          name="specialization"
-                          className={selectClassName}
-                          value={formData.specialization}
-                          onChange={handleChange}
-                          required
-                        >
-                          <option value="" disabled>Select Specialization</option>
-                          {SPECIALIZATIONS.map((spec) => (
-                            <option key={spec} value={spec}>
-                              {spec}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="space-y-2">
-                        <label className={labelClassName}>Experience (Years)</label>
-                        <Input type="number" name="experience" value={formData.experience} onChange={handleChange} required className={inputClassName} />
-                      </div>
-                      <div className="space-y-2">
-                        <label className={labelClassName}>Fees ($)</label>
-                        <Input type="number" name="feesPerConsultation" value={formData.feesPerConsultation} onChange={handleChange} required className={inputClassName} />
-                      </div>
-                      <div className="space-y-2 col-span-2">
-                        <label className={labelClassName}>Department</label>
-                        <Input name="department" value={formData.department} onChange={handleChange} required className={inputClassName} />
-                      </div>
-                      <div className="space-y-2 col-span-2">
-                        <label className={labelClassName}>Phone</label>
-                        <Input name="phone" value={formData.phone} onChange={handleChange} required className={inputClassName} />
-                      </div>
+                    <div className="space-y-2">
+                      <label className={labelClassName}>Gender</label>
+                      <select name="gender" className={selectClassName} value={formData.gender} onChange={handleChange}>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
                     </div>
-                  )}
+                    <div className="space-y-2 col-span-2">
+                      <label className={labelClassName}>Phone</label>
+                      <Input name="phone" value={formData.phone} onChange={handleChange} required className={inputClassName} />
+                    </div>
+                    <div className="space-y-2 col-span-2">
+                      <label className={labelClassName}>Address</label>
+                      <Input name="address" value={formData.address} onChange={handleChange} required className={inputClassName} />
+                    </div>
+                    <div className="space-y-2">
+                      <label className={labelClassName}>Blood Group</label>
+                      <select name="bloodGroup" className={selectClassName} value={formData.bloodGroup} onChange={handleChange}>
+                        <option value="" disabled>Select Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                      </select>
+                    </div>
+                  </div>
 
                   <div className="flex gap-3 mt-6">
                     <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl py-3">
@@ -304,6 +263,12 @@ export default function SignupPage() {
               Already have an account?{' '}
               <Link href="/login" className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium">
                 Sign in
+              </Link>
+            </div>
+            <div className="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">
+              Are you a doctor?{' '}
+              <Link href="/signup/doctor" className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium">
+                Doctor Onboarding →
               </Link>
             </div>
           </div>

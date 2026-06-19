@@ -193,33 +193,32 @@ export default function PublicDoctorProfilePage() {
               </div>
 
               {/* Specs Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 pt-2 text-sm text-slate-600 dark:text-slate-400">
-                <div className="flex items-center gap-3 justify-center sm:justify-start">
-                  <Briefcase size={18} className="text-teal-500 shrink-0" />
-                  <span>
-                    Experience: <strong className="text-slate-800 dark:text-slate-200 font-semibold">{profile.experience} Years</strong>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pt-6 mt-4 border-t border-slate-200 dark:border-white/10 text-sm">
+                <div className="flex items-center gap-3 justify-center md:justify-start">
+                  <Briefcase size={20} className="text-[#00d4aa] shrink-0" />
+                  <span className="text-slate-500 dark:text-[#94a3b8]">
+                    Experience: <strong className="text-slate-900 dark:text-white font-bold">{profile.experience} Years</strong>
                   </span>
                 </div>
-                {profile.hospitalName && (
-                  <div className="flex items-center gap-3 justify-center sm:justify-start">
-                    <MapPin size={18} className="text-teal-500 shrink-0" />
-                    <span>
-                      Hospital: <strong className="text-slate-800 dark:text-slate-200 font-semibold">{profile.hospitalName}</strong>
-                    </span>
-                  </div>
-                )}
-                {profile.opdTimings && (
-                  <div className="flex items-center gap-3 justify-center sm:justify-start">
-                    <Clock size={18} className="text-teal-500 shrink-0" />
-                    <span>
-                      OPD Timings: <strong className="text-slate-800 dark:text-slate-200 font-semibold">{profile.opdTimings}</strong>
-                    </span>
-                  </div>
-                )}
-                <div className="flex items-center gap-3 justify-center sm:justify-start">
-                  <DollarSign size={18} className="text-teal-500 shrink-0" />
-                  <span>
-                    Consultation Fee: <strong className="text-slate-800 dark:text-slate-200 font-semibold">Rs. {profile.feesPerConsultation}</strong>
+
+                <div className="flex items-center gap-3 justify-center md:justify-start">
+                  <MapPin size={20} className="text-[#00d4aa] shrink-0" />
+                  <span className="text-slate-500 dark:text-[#94a3b8]">
+                    Hospital: <strong className="text-slate-900 dark:text-white font-bold">{profile.hospitalName || 'HealthSync Clinic'}</strong>
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 justify-center md:justify-start">
+                  <Clock size={20} className="text-[#00d4aa] shrink-0" />
+                  <span className="text-slate-500 dark:text-[#94a3b8]">
+                    OPD Timings: <strong className="text-slate-900 dark:text-white font-bold">{profile.opdTimings || 'Mon, Wed, Fri: 10:00 AM - 02:00 PM'}</strong>
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 justify-center md:justify-start">
+                  <DollarSign size={20} className="text-[#00d4aa] shrink-0" />
+                  <span className="text-slate-500 dark:text-[#94a3b8]">
+                    Consultation Fee: <strong className="text-slate-900 dark:text-white font-bold">Rs. {profile.feesPerConsultation || 500}</strong>
                   </span>
                 </div>
               </div>

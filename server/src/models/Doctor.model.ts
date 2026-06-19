@@ -3,7 +3,10 @@ import { IDoctor } from '../interfaces/IDoctor';
 
 const doctorSchema = new Schema<IDoctor>({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-  specialization: { type: String, required: [true, 'Please add specialization'] },
+  // Legacy single-string specialization — kept for backward compat with seeded/existing doctors
+  specialization: { type: String },
+  // New multi-speciality array for doctors signed up via the new onboarding flow
+  specialities: { type: [String], default: [] },
   experience: { type: Number, required: [true, 'Please add experience years'] },
   feesPerConsultation: { type: Number, required: [true, 'Please add consultation fees'] },
   department: { type: String, required: [true, 'Please add department'] },
@@ -11,28 +14,37 @@ const doctorSchema = new Schema<IDoctor>({
   designation: { type: String },
   hospitalName: { type: String },
   opdTimings: { type: String },
-  profilePicture: { type: String },
+  opdSchedule: [{
+    day: { type: String },
+    startTime: { type: String },
+    endTime: { type: String },
+  }],
+  profilePhoto: { type: String },
   workExperience: [{
-    role: { type: String, required: true },
-    organization: { type: String, required: true },
-    duration: { type: String, required: true }
+    role: { type: String },
+    organization: { type: String },
+    duration: { type: String }
   }],
   education: [{
-    degree: { type: String, required: true },
-    institution: { type: String, required: true },
-    year: { type: String, required: true }
+    degree: { type: String },
+    institution: { type: String },
+    year: { type: String }
   }],
   specialityInterests: [{ type: String }],
   memberships: [{ type: String }],
   awards: [{
-    name: { type: String, required: true },
-    year: { type: String, required: true }
+    name: { type: String },
+    title: { type: String },
+    year: { type: String },
+    description: { type: String }
   }],
   publications: [{
-    title: { type: String, required: true },
-    journalName: { type: String, required: true }
+    title: { type: String },
+    journalName: { type: String },
+    year: { type: String },
+    url: { type: String }
   }],
-  languages: [{ type: String }],
+  languagesSpoken: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now },
 });
 

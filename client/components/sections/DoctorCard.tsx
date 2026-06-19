@@ -157,30 +157,26 @@ export const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
 
         {/* Doctor Details (Experience, Hospital, OPD Timings) */}
         <div className="space-y-2.5 text-sm">
-          <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400">
-            <Briefcase size={16} className="text-teal-500/80 group-hover:text-teal-500 transition-colors shrink-0" />
+          <div className="flex items-center gap-2.5 text-slate-700 dark:text-white">
+            <Briefcase size={16} className="text-[#00d4aa] shrink-0" />
             <span className="text-xs font-medium">
               {doctor.experience} years of experience
             </span>
           </div>
 
-          {doctor.hospitalName && (
-            <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400">
-              <MapPin size={16} className="text-teal-500/80 group-hover:text-teal-500 transition-colors shrink-0" />
-              <span className="text-xs font-medium line-clamp-1" title={doctor.hospitalName}>
-                {doctor.hospitalName.split(',')[0]} {/* Show main hospital name, clip city */}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-2.5 text-slate-700 dark:text-white">
+            <MapPin size={16} className="text-[#00d4aa] shrink-0" />
+            <span className="text-xs font-medium line-clamp-1" title={doctor.hospitalName || 'HealthSync Clinic'}>
+              {(doctor.hospitalName || 'HealthSync Clinic').split(',')[0]}
+            </span>
+          </div>
 
-          {doctor.opdTimings && (
-            <div className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400">
-              <Clock size={16} className="text-teal-500/80 group-hover:text-teal-500 transition-colors shrink-0" />
-              <span className="text-xs font-medium line-clamp-1" title={doctor.opdTimings}>
-                {doctor.opdTimings}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-2.5 text-slate-700 dark:text-white">
+            <Clock size={16} className="text-[#00d4aa] shrink-0" />
+            <span className="text-xs font-medium line-clamp-1" title={doctor.opdTimings || 'Mon, Wed, Fri: 10:00 AM - 02:00 PM'}>
+              {doctor.opdTimings || 'Mon, Wed, Fri: 10:00 AM - 02:00 PM'}
+            </span>
+          </div>
         </div>
       </div>
 
