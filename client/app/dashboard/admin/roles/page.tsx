@@ -322,6 +322,7 @@ export default function RolesPage() {
   const [savingPermissions, setSavingPermissions] = useState(false);
   const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -336,6 +337,7 @@ export default function RolesPage() {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const [r, p] = await Promise.all([
         api.get('/admin/roles'),
@@ -365,8 +367,9 @@ export default function RolesPage() {
       if (fetchedRoles.length > 0) {
         setSelectedRoleId(prev => prev ?? fetchedRoles[0]._id);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error loading roles/permissions data', err);
+      setError(err?.response?.data?.message || err?.message || 'Failed to load roles/permissions data. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -501,6 +504,18 @@ export default function RolesPage() {
           </div>
         </PermissionGuard>
       </div>
+
+      {error && (
+        <div className="px-4 py-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-sm text-red-600 dark:text-red-400 mb-4 flex justify-between items-center">
+          <span>{error}</span>
+          <button 
+            onClick={fetchData} 
+            className="underline font-semibold hover:text-red-800 dark:hover:text-red-300 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Role Cards — click to select */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
