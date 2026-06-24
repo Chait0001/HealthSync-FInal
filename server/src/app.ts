@@ -100,8 +100,11 @@ app.use(errorMiddleware);
 const PORT = Number(process.env.PORT) || 8080;
 
 const start = async (): Promise<void> => {
-  await DatabaseConnection.getInstance().connect();
+  // Start listening FIRST so Render detects the port immediately
   httpServer.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  // Then connect to MongoDB (if it fails, routes will error individually
+  // instead of blocking the entire server from starting)
+  await DatabaseConnection.getInstance().connect();
 };
 
 start();

@@ -26,7 +26,9 @@ export class DatabaseConnection {
     }
 
     try {
-      const conn = await mongoose.connect(uri);
+      const conn = await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 10000, // fail fast instead of hanging forever
+      });
       this.isConnected = true;
       console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
