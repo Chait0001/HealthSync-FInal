@@ -29,11 +29,12 @@ export default function ManageDoctorsPage() {
 
   const fetchDoctors = async () => {
     try {
-      const response = await api.get('/admin/doctors');
+      const response = await api.get('/doctors');
+      console.log('Doctors API response:', response.data);
       const data = response.data.data || response.data;
       setDoctors(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.error('Failed to fetch doctors:', error.response?.status, error.response?.data || error.message);
       setDoctors([]);
     } finally {
       setLoading(false);
