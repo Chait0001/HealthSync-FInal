@@ -20,6 +20,8 @@ import {
 import { PermissionsProvider } from '@/context/PermissionsContext';
 import { usePermission } from '@/hooks/usePermission';
 import { NotificationBell } from '@/components/NotificationBell';
+import { ToastContainer } from '@/components/ui/Toast';
+import { useSocket } from '@/context/SocketContext';
 
 // Skeleton Loading for the entire dashboard layout
 function DashboardSkeleton() {
@@ -114,6 +116,7 @@ function DashboardSkeleton() {
 
 function DashboardInner({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
+  const { isConnected } = useSocket();
   const pathname = usePathname();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
@@ -193,7 +196,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
               <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400 flex items-center justify-center text-sm font-semibold">
                 {(user?.name || 'U').charAt(0).toUpperCase()}
               </div>
-              <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white dark:border-slate-900"></span>
+              <span className={`absolute bottom-0 right-0 w-2 h-2 rounded-full border border-white dark:border-slate-900 ${isConnected ? 'bg-green-500' : 'bg-slate-400'}`}></span>
             </div>
             <div className={`flex-1 min-w-0 ${!isSidebarOpen && 'hidden'}`}>
               <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{user?.name}</p>
@@ -218,6 +221,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </main>
+      <ToastContainer />
     </div>
   );
 }

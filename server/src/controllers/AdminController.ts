@@ -2,9 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { IAdminService } from '../interfaces/IServices';
 import { ApiResponse } from '../utils/ApiResponse';
 import { NotificationModel } from '../models/Notification.model';
+import { SocketService } from '../services/SocketService';
 
 export class AdminController {
-  constructor(private readonly adminService: IAdminService) {}
+  constructor(
+    private readonly adminService: IAdminService,
+    private readonly socketService: SocketService
+  ) {}
 
   getStats = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -105,24 +109,60 @@ export class AdminController {
       const doctorName = (appointment.doctorId as any)?.userId?.name || 'your doctor';
       const patientName = (appointment.patientId as any)?.name || 'your patient';
 
-      // Notify patient
-      await NotificationModel.create({
+      // Notify patient — persist to DB
+      const patientNotification = await NotificationModel.create({
         userId: patientId,
         title: 'Appointment Reminder',
         message: `Reminder: You have an appointment with Dr. ${doctorName} on ${dateStr} at ${timeStr}.`,
         type: 'reminder',
         appointmentId: appointment._id,
+        sentViaSocket: this.socketService.isUserOnline(patientId.toString()),
+        deliveredAt: this.socketService.isUserOnline(patientId.toString()) ? new Date() : undefined,
       });
 
-      // Notify doctor
+      // Emit real-time reminder to patient
+      const patientPayload = {
+        _id: patientNotification._id,
+        title: patientNotification.title,
+        message: patientNotification.message,
+        type: patientNotification.type,
+        isRead: false,
+        appointmentId: appointment._id,
+        createdAt: patientNotification.createdAt,
+      };
+      this.socketService.sendToUser(patientId.toString(), 'reminder_notification', {
+        notification: patientPayload,
+        appointment: { _id: appointment._id, date: appointment.date, status: appointment.status },
+      });
+      this.socketService.sendToUser(patientId.toString(), 'notification_received', patientPayload);
+
+      // Notify doctor — persist to DB
       if (doctorUserId) {
-        await NotificationModel.create({
+        const doctorNotification = await NotificationModel.create({
           userId: doctorUserId,
           title: 'Appointment Reminder',
           message: `Reminder: You have an appointment with patient ${patientName} on ${dateStr} at ${timeStr}.`,
           type: 'reminder',
           appointmentId: appointment._id,
+          sentViaSocket: this.socketService.isUserOnline(doctorUserId.toString()),
+          deliveredAt: this.socketService.isUserOnline(doctorUserId.toString()) ? new Date() : undefined,
         });
+
+        // Emit real-time reminder to doctor
+        const doctorPayload = {
+          _id: doctorNotification._id,
+          title: doctorNotification.title,
+          message: doctorNotification.message,
+          type: doctorNotification.type,
+          isRead: false,
+          appointmentId: appointment._id,
+          createdAt: doctorNotification.createdAt,
+        };
+        this.socketService.sendToUser(doctorUserId.toString(), 'reminder_notification', {
+          notification: doctorPayload,
+          appointment: { _id: appointment._id, date: appointment.date, status: appointment.status },
+        });
+        this.socketService.sendToUser(doctorUserId.toString(), 'notification_received', doctorPayload);
       }
 
       res.json(ApiResponse.success(null, 'Reminder notifications sent successfully'));

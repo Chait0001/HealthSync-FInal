@@ -7,6 +7,9 @@ const notificationSchema = new Schema({
   type:     { type: String, enum: ['reminder', 'approval', 'cancellation', 'general'], default: 'general' },
   isRead:   { type: Boolean, default: false },
   appointmentId: { type: Schema.Types.ObjectId, ref: 'Appointment' },
+  sentViaSocket: { type: Boolean, default: false },
+  deliveredAt:   { type: Date },
+  readAt:        { type: Date },
 }, { timestamps: true });
 
 notificationSchema.index({ userId: 1, isRead: 1 });

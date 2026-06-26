@@ -4,6 +4,9 @@ import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
+import { SocketProvider } from "@/context/SocketContext";
+import { NotificationProvider } from "@/context/NotificationContext";
+import { OnlineUsersProvider } from "@/context/OnlineUsersContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +26,13 @@ export default function RootLayout({
         <ThemeProvider>
           <ThemeWrapper>
             <AuthProvider>
-              {children}
+              <SocketProvider>
+                <NotificationProvider>
+                  <OnlineUsersProvider>
+                    {children}
+                  </OnlineUsersProvider>
+                </NotificationProvider>
+              </SocketProvider>
             </AuthProvider>
           </ThemeWrapper>
         </ThemeProvider>
