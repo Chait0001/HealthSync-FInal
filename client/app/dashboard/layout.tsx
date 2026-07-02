@@ -22,6 +22,8 @@ import { usePermission } from '@/hooks/usePermission';
 import { NotificationBell } from '@/components/NotificationBell';
 import { ToastContainer } from '@/components/ui/Toast';
 import { useSocket } from '@/context/SocketContext';
+import { ChatProvider } from '@/context/ChatContext';
+import { ChatWidget } from '@/components/ChatWidget';
 
 // Skeleton Loading for the entire dashboard layout
 function DashboardSkeleton() {
@@ -212,7 +214,8 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto relative z-10">
-        <div className="sticky top-0 z-10 flex items-center justify-end px-6 py-3 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#0f1117]/80 backdrop-blur-sm">
+        <div className="sticky top-0 z-10 flex items-center justify-end px-6 py-3 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#0f1117]/80 backdrop-blur-sm gap-2">
+          {(user?.role === 'doctor' || user?.role === 'patient') && <ChatWidget />}
           <NotificationBell />
         </div>
         <div className="p-6 md:p-8">
@@ -261,7 +264,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <PermissionsProvider>
-      <DashboardInner>{children}</DashboardInner>
+      <ChatProvider>
+        <DashboardInner>{children}</DashboardInner>
+      </ChatProvider>
     </PermissionsProvider>
   );
 }

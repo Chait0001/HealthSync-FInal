@@ -67,30 +67,7 @@ export default function SignupPage() {
       return;
     }
     setError('');
-
-    // Admin doesn't need profile details
-    if (formData.role === 'admin') {
-      handleAdminSubmit();
-    } else {
-      setStep(2);
-    }
-  };
-
-  const handleAdminSubmit = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      await register({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        role: 'admin'
-      });
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
-    } finally {
-      setIsLoading(false);
-    }
+    setStep(2);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,17 +145,7 @@ export default function SignupPage() {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2 col-span-2">
-                      <label className={labelClassName}>Role</label>
-                      <select
-                        name="role"
-                        className={selectClassName}
-                        value={formData.role}
-                        onChange={handleChange}
-                      >
-                        <option value="patient">Patient</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                      <p className="text-xs text-slate-400 mt-1.5">
+                      <p className="text-xs text-slate-400">
                         Are you a doctor?{' '}
                         <Link href="/signup/doctor" className="text-teal-400 hover:underline font-medium">
                           Register here instead
@@ -203,7 +170,7 @@ export default function SignupPage() {
                     </div>
                   </div>
                   <Button type="submit" className="w-full mt-4 bg-teal-600 dark:bg-teal-500 hover:bg-teal-700 dark:hover:bg-teal-600 text-white font-bold py-3 rounded-xl transition-all" disabled={isLoading}>
-                    {isLoading ? <Loader2 className="animate-spin mr-2" /> : formData.role === 'admin' ? 'Create Admin Account' : 'Next: Profile Details'}
+                    {isLoading ? <Loader2 className="animate-spin mr-2" /> : 'Next: Profile Details'}
                   </Button>
                 </>
               )}

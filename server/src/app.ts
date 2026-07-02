@@ -23,6 +23,7 @@ import { AdminService } from './services/AdminService';
 import { RoleService } from './services/RoleService';
 import { SocketService } from './services/SocketService';
 import { MessageService } from './services/MessageService';
+import { ChatService } from './services/ChatService';
 
 // Controllers
 import { AuthController } from './controllers/AuthController';
@@ -38,6 +39,7 @@ import { createAppointmentRouter } from './routes/appointment.routes';
 import { createAdminRouter } from './routes/admin.routes';
 import { createRoleRouter } from './routes/role.routes';
 import { createMessageRouter } from './routes/message.routes';
+import { createChatRouter } from './routes/chat.routes';
 import notificationRouter from './routes/notification.routes';
 
 // Middleware
@@ -63,6 +65,7 @@ const appointmentService = new AppointmentService(appointmentRepo, doctorRepo);
 const adminService       = new AdminService(userRepo, doctorRepo, appointmentRepo, roleRepo, roleService, permRepo);
 const socketService      = SocketService.getInstance();
 const messageService     = new MessageService(socketService);
+const chatService        = new ChatService(socketService);
 
 const authController        = new AuthController(authService);
 const doctorController      = new DoctorController(doctorService);
@@ -177,6 +180,43 @@ io.on('connection', (socket) => {
     }
   });
 
+  // ─── Event: chat:send ────────────────────────────────────────────────────────
+  socket.on('chat:send', async (data: { toUserId: string; text: string }) => {
+    try {
+      if (!data?.toUserId || !data?.text) {
+        socket.emit('error_message', { message: 'toUserId and text are required' });
+        return;
+      }
+      await chatService.sendMessage(userId, data.toUserId, data.text);
+    } catch (err: any) {
+      console.error('Error in chat:send socket event:', err);
+      socket.emit('error_message', { message: err.message || 'Failed to send chat message' });
+    }
+  });
+
+  // ─── Event: chat:typing ──────────────────────────────────────────────────────
+  socket.on('chat:typing', (data: { toUserId: string; isTyping: boolean }) => {
+    try {
+      if (!data?.toUserId) return;
+      socketService.sendToUser(data.toUserId, 'chat:typing', {
+        fromUserId: userId,
+        isTyping: !!data.isTyping,
+      });
+    } catch (err) {
+      console.error('Error in chat:typing socket event:', err);
+    }
+  });
+
+  // ─── Event: chat:mark_read ───────────────────────────────────────────────────
+  socket.on('chat:mark_read', async (data: { otherUserId: string }) => {
+    try {
+      if (!data?.otherUserId) return;
+      await chatService.markConversationRead(userId, data.otherUserId);
+    } catch (err) {
+      console.error('Error in chat:mark_read socket event:', err);
+    }
+  });
+
   // ─── Event: disconnect ──────────────────────────────────────────────────────
   socket.on('disconnect', () => {
     console.log(`🔌 Client disconnected: ${name} (${role}) — ${socket.id}`);
@@ -196,6 +236,7 @@ app.use('/api/admin',        createAdminRouter(adminController));
 app.use('/api/roles',        createRoleRouter(roleController));
 app.use('/api/notifications', notificationRouter);
 app.use('/api/messages',     createMessageRouter(messageService));
+app.use('/api/chat',         createChatRouter(chatService));
 
 app.get('/', (_req, res) => res.json({ message: 'HealthSync API running ✅' }));
 
